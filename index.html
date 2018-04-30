@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <title>Fire Mountain Merit Badge Registration</title>
+        <link rel="stylesheet" href="styles/bootstrap.min.css" type="text/css" media="all">
+        <link href="styles/signin.css" rel="stylesheet" />
+        <script src="scripts/jquery-3.2.1.min.js"></script>
+        <script src="scripts/bootstrap.min.js"></script>
+    </head>
+    <body>
+    <div class="container">
+        <section id="intro">
+        <header>
+            <h2>Fire Mountain</h2>
+            <h2>Merit Badge Registration</h2>
+            <div id="logo_container" class="pull-right"><img src="http://firemtn.org/images/fm_round_logo.png" alt=""></div>
+        </header>
+        </section>
+      <form id="frm_login" class="form-signin" method="POST" action="./registration">
+        <h2 class="form-signin-heading">Please sign in</h2>
+        <label for="inputEmail" class="sr-only">Username</label>
+        <input type="text" id="inputUsername" class="form-control" placeholder="Username" required autofocus>
+        <label for="inputPassword" class="sr-only">Password</label>
+        <input type="password" id="inputPassword" class="form-control" placeholder="Password" required>
+        <!--
+        <div class="checkbox">
+          <label>
+            <input type="checkbox" value="remember-me"> Remember me
+          </label>
+        </div>
+        -->
+        <button id="btn_login" class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
+        <div id="error_msg"></div>
+      </form>
+    </div>
+
+        <script type="text/javascript">
+            $(document).ready(function() {
+                $( "#frm_login" ).submit(function( event ) {
+                    event.preventDefault();
+                    $.ajax({
+                            type: "POST",
+                            url: "./registration/registrationsvc.php",
+                            data: {'action': 'login', 'user': $('#inputUsername').val(), 'password': $('#inputPassword').val()},
+                            dataType: "json",
+                            success: function (response)
+                            {
+                                if(response.valid == 'true' && response.admin == 1)
+                                {
+                                    window.location = "http://firemtn.org/ProjH/administration"
+                                }
+                                else if(response.valid == 'true')
+                                {
+                                    window.location = "http://firemtn.org/ProjH/registration"
+                                }
+                                else
+                                {
+                                    $('#error_msg').html('<h3>Invalid login information</h3>');
+                                }
+                            }
+                        });
+
+
+                });
+            });
+        </script>
+    </body>
+</html>

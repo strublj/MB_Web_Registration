@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <title>Fire Mountain Merit Badge Registration</title>
+        <link rel="stylesheet" href="../styles/bootstrap.min.css" type="text/css" media="all">
+        <link href="../styles/jquery.bootgrid.min.css" rel="stylesheet" />
+        <link href="../styles/styles.css" rel="stylesheet" />
+        <script src="../scripts/jquery-3.2.1.min.js"></script>
+        <script src="../scripts/bootstrap.min.js"></script>
+        <script src="../scripts/jquery.bootgrid.min.js"></script>
+        <script src="../scripts/angular.min.js"></script>
+        <script src="../scripts/angular-messages.min.js"></script>
+    </head>
+    <body ng-app="app" ng-controller="formCtrl">
+        <div class="container">
+            <section id="intro">
+                <header>
+                    <h2>Fire Mountain</h2>
+                    <h2>Merit Badge Registration</h2>
+                    <div id="logo_container" class="pull-right"><img src="http://firemtn.org/images/fm_round_logo.png" alt=""></div>
+                </header>
+            </section>  
+            <div class="">
+                <div class="col-sm-12">
+                    <div class="well clearfix">
+                        <div class="pull-left">
+                            <h2 id="reg_title"></h2>
+                            <a href="https://www.mountbakerbsa.org/camping/fire-mountain-scout-camp/" target="_blank">Registration Frequently Asked Questions</a>
+                        </div>
+                        <div class="pull-right" style="padding-top: 25px">
+                            <button type="button" class="btn btn-xs btn-primary" id="btn_logout" data-row-id="0">
+                                <span class="glyphicon glyphicon-asterisk"></span>Logout</button>
+                        </div>
+                    </div>
+                    <table id="scout_reg_grid" class="table table-condensed table-hover table-striped" width="90%" cellspacing="0" data-toggle="bootgrid">
+                        <thead>
+                            <tr>
+                                <th data-column-id="scout_id" data-type="numeric" data-identifier="true" data-visible="false">ScoutID</th>
+                                <th data-column-id="scout_first">First</th>
+                                <th data-column-id="scout_last">Last</th>
+                                <th data-column-id="scout_age" data-visible="false">Age</th>
+                                <th data-column-id="scout_rank" data-visible="false">Rank</th>
+                                <th data-column-id="scout_pref1">1st</th>
+                                <th data-column-id="scout_pref2">2nd</th>
+                                <th data-column-id="scout_pref3">3rd</th>
+                                <th data-column-id="scout_pref4">4th</th>
+                                <th data-column-id="scout_pref5">5th</th>
+                                <th data-column-id="scout_pref6">6th</th>
+                                <th data-column-id="commands" data-formatter="commands" data-sortable="false"></th>
+                            </tr>
+                        </thead>
+                    </table>
+                    <div class="pull-left" style="padding-top: 25px">
+                            <button type="button" class="btn btn-xs btn-primary" id="btn_add_modal" data-row-id="0">
+                                <span class="glyphicon glyphicon-plus"></span>Add Scout</button>
+                        </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="add_model" class="modal fade">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                        <h4 class="modal-title">Add Registration</h4>
+                    </div>
+                    <form method="post" id="frm_add" name="frm_add" novalidate>
+                        <div class="modal-body">
+                            <input type="hidden" value="add" name="action" id="action">
+                            <div class="form-group">
+                                <label for="first" class="control-label">First Name:</label>
+                                <input type="text" class="form-control" id="first" name="first" ng-model="first" required/>
+                                <div ng-messages="frm_add.first.$error" ng-if="frm_add.first.$touched">
+                                    <div ng-message="required" class="help-block">Name is required</div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="last" class="control-label">Last Name:</label>
+                                <input type="text" class="form-control" id="last" name="last" ng-model="last" required/>
+                                <div ng-messages="frm_add.last.$error" ng-if="frm_add.last.$touched">
+                                    <div ng-message="required" class="help-block">Name is required</div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="age" class="control-label">Age:</label>
+                                <input type="text" class="form-control numbersOnly" id="age" name="age" ng-model="age" required/>
+                                <div ng-messages="frm_add.age.$error" ng-if="frm_add.age.$touched">
+                                    <div ng-message="required" class="help-block">Age is required</div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="rank" class="control-label">Rank:</label>
+                                <select class="form-control" id="rank" name="rank"></select>
+                            </div>
+                            <div class="form-group">
+                                <label for="pref1" class="control-label">1st Preference:</label>
+                                <select class="form-control" id="pref1" name="pref1"></select>
+                            </div>
+                            <div class="form-group">
+                                <label for="pref2" class="control-label">2nd Preference:</label>
+                                <select class="form-control" id="pref2" name="pref2"></select>
+                            </div>
+                            <div class="form-group">
+                                <label for="pref3" class="control-label">3rd Preference:</label>
+                                <select class="form-control" id="pref3" name="pref3"></select>
+                            </div>
+                            <div class="form-group">
+                                <label for="pref4" class="control-label">4th Preference:</label>
+                                <select class="form-control" id="pref4" name="pref4"></select>
+                            </div>
+                            <div class="form-group">
+                                <label for="pref5" class="control-label">5th Preference:</label>
+                                <select class="form-control" id="pref5" name="pref5"></select>
+                            </div>
+                            <div class="form-group">
+                                <label for="pref6" class="control-label">6th Preference:</label>
+                                <select class="form-control" id="pref6" name="pref6"></select>
+                            </div>
+                    </div>
+                    <div id="error_msg"></div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal" ng-click="add_reset()">Cancel</button>
+                        <button type="button" id="btn_add" class="btn btn-primary">Save</button>
+                    </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div id="edit_model" class="modal fade">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                        <h4 class="modal-title">Edit Registration</h4>
+                    </div>
+                    <form method="post" id="frm_edit" name="frm_edit" novalidate>
+                        <div class="modal-body">
+                            <input type="hidden" value="edit" name="action" id="action">
+                            <input type="hidden" value="0" name="edit_scout_id" id="edit_scout_id">
+                            <div class="form-group">
+                                <label for="first" class="control-label">First Name:</label>
+                                <input type="text" class="form-control" id="edit_first" name="edit_first" ng-model="edit_first" required/>
+                                <div ng-messages="frm_edit.edit_first.$error" ng-if="frm_edit.edit_first.$touched">
+                                    <div ng-message="required" class="help-block">Name is required</div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="last" class="control-label">Last Name:</label>
+                                <input type="text" class="form-control" id="edit_last" name="edit_last" ng-model="edit_last" required/>
+                                <div ng-messages="frm_edit.edit_last.$error" ng-if="frm_edit.edit_last.$touched">
+                                    <div ng-message="required" class="help-block">Name is required</div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="age" class="control-label">Age:</label>
+                                <input type="text" class="form-control numbersOnly" id="edit_age" name="edit_age" ng-model="edit_age" required/>
+                                <div ng-messages="frm_edit.edit_age.$error" ng-if="frm_edit.edit_age.$touched">
+                                    <div ng-message="required" class="help-block">Age is required</div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="rank" class="control-label">Rank:</label>
+                                <select class="form-control" id="edit_rank" name="edit_rank"></select>
+                            </div>
+                            <div class="form-group">
+                                <label for="pref1" class="control-label">1st Preference:</label>
+                                <select class="form-control" id="edit_pref1" name="edit_pref1"></select>
+                            </div>
+                            <div class="form-group">
+                                <label for="pref2" class="control-label">2nd Preference:</label>
+                                <select class="form-control" id="edit_pref2" name="edit_pref2"></select>
+                            </div>
+                            <div class="form-group">
+                                <label for="pref3" class="control-label">3rd Preference:</label>
+                                <select class="form-control" id="edit_pref3" name="edit_pref3"></select>
+                            </div>
+                            <div class="form-group">
+                                <label for="pref4" class="control-label">4th Preference:</label>
+                                <select class="form-control" id="edit_pref4" name="edit_pref4"></select>
+                            </div>
+                            <div class="form-group">
+                                <label for="pref5" class="control-label">5th Preference:</label>
+                                <select class="form-control" id="edit_pref5" name="edit_pref5"></select>
+                            </div>
+                            <div class="form-group">
+                                <label for="pref6" class="control-label">6th Preference:</label>
+                                <select class="form-control" id="edit_pref6" name="edit_pref6"></select>
+                            </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                        <button type="button" id="btn_edit" class="btn btn-primary">Save</button>
+                    </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div id="delete_model" class="modal fade">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                        <h4 class="modal-title">Delete Registration</h4>
+                    </div>
+                    <form method="post" id="frm_delete" name="frm_delete" novalidate>
+                        <div class="modal-body">
+                            <input type="hidden" value="delete" name="action" id="action">
+                            <input type="hidden" value="0" name="delete_scout_id" id="delete_scout_id">
+                            <p id="delete_msg">Place holder delete message?</p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                            <button type="button" id="btn_delete" class="btn btn-primary">Delete</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <script type="text/javascript">
+            var app = angular.module('app', ['ngMessages']);
+            app.controller('formCtrl', function($scope) {
+                $scope.add_reset = function() {
+                    this.frm_add.$setPristine();
+                    this.frm_add.$setUntouched();
+                    $('#error_msg').html('');
+                };
+            });
+            
+            $(document).ready(function () {
+
+                //Helper to load dropdown lists with provided data
+                function loadClassList(selID, data, defaultText) {
+                    $("#" + selID).get(0).options.length = 0;
+                                $("#" + selID).get(0).options[0] = new Option(defaultText, "-1");   
+         
+                                $.each(data, function (index, item) {
+                                        $("#" + selID).get(0).options[$("#" + selID).get(0).options.length] = new Option(item.class_name, item.class_id);
+                                });
+                }
+                
+                function loadRankList(selID, data, defaultText) {
+                    $("#" + selID).get(0).options.length = 0;
+                                $("#" + selID).get(0).options[0] = new Option(defaultText, "-1");   
+         
+                                $.each(data, function (index, item) {
+                                        $("#" + selID).get(0).options[$("#" + selID).get(0).options.length] = new Option(item.rank_name, item.rank_id);
+                                });
+                }
+
+                //Load each of the dropdown boxes on the Add/Edit modal boxes
+                $.ajax({
+                    type: "POST",
+                    url: "registrationsvc.php",
+                    data: {'action': 'getUnitInfo'},
+                    dataType: "json",
+                    success: function (response)
+                    {
+                        if(response.success == 'true')
+                        {
+                            var welcome_msg = 'Registration for ' + response.unit_type + ' ' + response.unit_number + ' Week ' + response.week_number + ' - ' + response.week_date_text;
+                            $('#reg_title').html(welcome_msg);
+                        }
+                        else
+                        {
+                            window.location = "http://firemtn.org/ProjH"
+                        }
+                    }
+                });
+
+                //Load each of the dropdown boxes on the Add/Edit modal boxes
+                $.ajax({
+                    type: "POST",
+                    url: "registrationsvc.php",
+                    data: {'action': 'classList'},
+                    dataType: "json",
+                    success: function (response)
+                    {
+                        loadClassList("pref1", response, "Select preference");
+                        loadClassList("pref2", response, "Select preference");
+                        loadClassList("pref3", response, "Select preference");
+                        loadClassList("pref4", response, "Select preference");
+                        loadClassList("pref5", response, "Select preference");
+                        loadClassList("pref6", response, "Select preference");
+                        loadClassList("edit_pref1", response, "Select preference");
+                        loadClassList("edit_pref2", response, "Select preference");
+                        loadClassList("edit_pref3", response, "Select preference");
+                        loadClassList("edit_pref4", response, "Select preference");
+                        loadClassList("edit_pref5", response, "Select preference");
+                        loadClassList("edit_pref6", response, "Select preference");
+                    }
+                });
+
+                //Load each of the dropdown boxes on the Add/Edit modal boxes
+                $.ajax({
+                    type: "POST",
+                    url: "registrationsvc.php",
+                    data: {'action': 'rankList'},
+                    dataType: "json",
+                    success: function (response)
+                    {
+                        loadRankList("rank", response, "Select rank");
+                        loadRankList("edit_rank", response, "Select rank");
+                    }
+                });
+
+                /*
+                 * jQuery Bootgrid control setup
+                 * 
+                 * http://www.jquery-bootgrid.com/Documentation
+                 */
+                var grid = $("#scout_reg_grid").bootgrid({
+                    ajax: true,
+                    rowSelect: false,
+                    rowCount: -1, // Disable pagination (returns all rows)
+                    navigation: 0,
+                    post: function ()
+                    {
+                        /* To accumulate custom parameter with the request object */
+                        return {
+                            id: "b0df282a-0d67-40e5-8558-c9e93b7befed"
+                        };
+                    },
+
+                    url: "registrationsvc.php",
+                    formatters: {
+                        "commands": function (column, row)
+                        {
+                            return "<button type=\"button\" class=\"btn btn-xs btn-default command-edit\" data-row-id=\"" + row.scout_id + "\"><span class=\"glyphicon glyphicon-edit\"></span></button> " +
+                                    "<button type=\"button\" class=\"btn btn-xs btn-default command-delete\" data-row-id=\"" + row.scout_id + "\"><span class=\"glyphicon glyphicon-trash\"></span></button>";
+                        }
+                    }
+                }).on("loaded.rs.jquery.bootgrid", function ()
+                {
+                    /*
+                     * Event listener for the 'Edit' button click.
+                     */
+                    grid.find(".command-edit").on("click", function (e)
+                    {
+                        //alert("You pressed edit on row: " + $(this).data("row-id"));
+                        var ele = $(this).parent();
+
+                        $('#edit_model').modal('show');
+                        if ($(this).data("row-id") > 0) {
+                            $.ajax({
+                                type: "POST",
+                                url: "registrationsvc.php",
+                                data: {'action': 'getScoutReg', 'scoutId': $(this).data("row-id")},
+                                dataType: "json",
+                                success: function (response)
+                                {
+                                    // Setup data from record in Edit form
+                                    $('#edit_scout_id').val(response.scout_id);
+                                    $('#edit_first').val(response.scout_first);
+                                    $('#edit_last').val(response.scout_last);
+                                    $('#edit_age').val(response.scout_age);
+                                    $('#edit_rank option').filter(function() { 
+                                            return this.text == response.scout_rank;
+                                        }).prop('selected', 'selected');
+                                    $('#edit_pref1 option').filter(function() { 
+                                            return this.text == response.scout_pref1;
+                                        }).prop('selected', 'selected');
+                                    $('#edit_pref2 option').filter(function() { 
+                                            return this.text == response.scout_pref2;
+                                        }).prop('selected', 'selected'); 
+                                    $('#edit_pref3 option').filter(function() { 
+                                            return this.text == response.scout_pref3;
+                                        }).prop('selected', 'selected'); 
+                                    $('#edit_pref4 option').filter(function() { 
+                                            return this.text == response.scout_pref4;
+                                        }).prop('selected', 'selected'); 
+                                    $('#edit_pref5 option').filter(function() { 
+                                            return this.text == response.scout_pref5;
+                                        }).prop('selected', 'selected'); 
+                                    $('#edit_pref6 option').filter(function() { 
+                                            return this.text == response.scout_pref6;
+                                        }).prop('selected', 'selected'); 
+                                }
+                            });                    
+                        } 
+                    // Event listener for the 'Delete' button click.
+                    }).end().find(".command-delete").on("click", function (e)
+                    {
+                        var ele = $(this).parent();
+                        var del_conf_msg = 'Delete registration for ' + ele.siblings(':nth-of-type(1)').html() + ' ' + ele.siblings(':nth-of-type(2)').html() + '?';
+                        
+                        $('#delete_scout_id').val($(this).data("row-id"));
+                        $('#delete_msg').html(del_conf_msg);
+                        $('#delete_model').modal('show');
+                    });
+                });
+
+                // Grid ajax action function for Add/Edit calls
+                function ajaxAction(action) {
+                    data = $("#frm_" + action).serializeArray();
+                    $.ajax({
+                        type: "POST",
+                        url: "registrationsvc.php",
+                        data: data,
+                        dataType: "json",
+                        success: function (response)
+                        {
+                            $('#' + action + '_model').modal('hide');
+                            $("#scout_reg_grid").bootgrid('reload');
+                        }
+                    });
+                }
+
+                // Delete operations
+                $("#btn_delete").click(function () {
+                    ajaxAction('delete');
+                });
+
+                // Add operations
+                $("#btn_add_modal").click(function () {
+                    // Reset form to default values
+                    $('#first').val('');
+                    $('#last').val('');
+                    $('#age').val('');
+                    $('#rank').prop('selectedIndex', 0);
+                    $('#pref1').prop('selectedIndex', 0);
+                    $('#pref2').prop('selectedIndex', 0);
+                    $('#pref3').prop('selectedIndex', 0);
+                    $('#pref4').prop('selectedIndex', 0);
+                    $('#pref5').prop('selectedIndex', 0);
+                    $('#pref6').prop('selectedIndex', 0);
+                        
+                    $('#add_model').modal('show');
+                });
+                $("#btn_add").click(function () {
+                    if($('#frm_add')[0].checkValidity())
+                    {
+                        $('#error_msg').html('');
+                        ajaxAction('add');
+                    }
+                    else
+                    {
+                        $('#error_msg').html('<h3>Name and age are required</h3>');
+                    }
+                });
+                
+
+               // Edit record button click event to load the modal box
+                $("#btn_edit").click(function () {
+                    if($('#frm_edit')[0].checkValidity())
+                    {
+                        ajaxAction('edit');
+                    }
+                });
+
+                // Logout button click
+                $('#btn_logout').click(function() {
+                    $.ajax({
+                        type: "POST",
+                        url: "registrationsvc.php",
+                        data: {'action': 'logout'},
+                        dataType: "json",
+                        success: function (response)
+                        {
+                            if(response.success == 'true')
+                            {
+                                window.location = "http://firemtn.org/ProjH"
+                            }
+                        }
+                    });
+                });
+
+                // Ensure certain fields only allow whole numbers
+                $('.numbersOnly').keyup(function () { 
+                    this.value = this.value.replace(/[^0-9]/g,'');
+                });
+            });
+        </script>
+    </body>
+</html>

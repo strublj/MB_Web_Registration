@@ -1,0 +1,109 @@
+body {
+  padding-top: 40px;
+  padding-bottom: 40px;
+  background-color: #eee;
+}
+
+.form-signin {
+  max-width: 330px;
+  padding: 15px;
+  margin: 0 auto;
+}
+.form-signin .form-signin-heading,
+.form-signin .checkbox {
+  margin-bottom: 10px;
+}
+.form-signin .checkbox {
+  font-weight: normal;
+}
+.form-signin .form-control {
+  position: relative;
+  height: auto;
+  -webkit-box-sizing: border-box;
+     -moz-box-sizing: border-box;
+          box-sizing: border-box;
+  padding: 10px;
+  font-size: 16px;
+}
+.form-signin .form-control:focus {
+  z-index: 2;
+}
+.form-signin input[type="email"] {
+  margin-bottom: -1px;
+  border-bottom-right-radius: 0;
+  border-bottom-left-radius: 0;
+}
+.form-signin input[type="password"] {
+  margin-bottom: 10px;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
+    
+#intro {
+	position: relative;
+	margin-top: 25px;
+	background: url("../images/FM_Header_No_Logo.png");
+        background-repeat: no-repeat;
+        
+	/* background size */
+        background-size: 100%;
+	
+	/* curved border radius */
+	border-radius: 10px;
+        
+        width: 100%;
+        height: 100%;
+	}
+	
+#intro h2, #intro p {
+	position: relative;
+	width: 500px;
+	}
+	
+#intro h2 {
+	padding-top: 20px;
+        padding-bottom: 10px;
+        padding-left: 20px;
+        padding-right: 0px;
+	font-weight: bolder;
+	color: #fff;
+	}
+	
+#intro p {
+	padding: 0;
+	color: #d6a965;
+	}
+	
+#logo_container img {
+        width: 10%;
+        height: auto;
+        float: right;
+        position: absolute;
+	bottom: 5px;
+	right: 5px;
+}
+      
+        #error_msg h3 {
+            color: #f00;
+        }
+        
+@media (max-width: 1000px) {
+    
+    /* intro */
+
+    #intro h2, #intro p {
+        position: relative;
+        width: 70%;
+    }
+
+    #intro h2 {
+        padding: 0 0 5px 0;
+        font-weight: bolder;
+        color: #fff;
+    }
+
+    #intro p {
+        padding: 0;
+        color: #d6a965;
+    }
+}

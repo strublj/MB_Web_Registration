@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <title>Fire Mountain Merit Badge Registration</title>
+        <link rel="stylesheet" href="../styles/bootstrap.min.css" type="text/css" media="all">
+        <link href="../styles/jquery.bootgrid.min.css" rel="stylesheet" />
+        <link href="../styles/styles.css" rel="stylesheet" />
+        <script src="../scripts/jquery-3.2.1.min.js"></script>
+        <script src="../scripts/bootstrap.min.js"></script>
+        <script src="../scripts/jquery.bootgrid.min.js"></script>
+        <script src="../scripts/angular.min.js"></script>
+        <script src="../scripts/angular-messages.min.js"></script>
+    </head>
+    <body ng-app="app" ng-controller="formCtrl">
+        <div class="container">
+            <section id="intro">
+                <header>
+                    <h2>Fire Mountain</h2>
+                    <h2>Merit Badge Registration</h2>
+                    <div id="logo_container" class="pull-right"><img src="http://firemtn.org/images/fm_round_logo.png" alt=""></div>
+                </header>
+            </section>  
+            <div class="">
+                <div class="col-sm-12">
+                    <div class="well clearfix">
+                        <div class="pull-left">
+                            <h2 id="admin_title">Merit Badge Registration Administration</h2>
+                        </div>
+                        <div class="pull-right" style="padding-top: 25px">
+                            <button type="button" class="btn btn-xs btn-primary" id="btn_logout" data-row-id="0">
+                                <span class="glyphicon glyphicon-asterisk"></span>Logout</button>
+                        </div>
+                    </div>
+                    <p>List of links to admin screens and tasks</p>
+                </div>
+            </div>
+        </div>
+
+        <script type="text/javascript">
+            var app = angular.module('app', ['ngMessages']);
+            
+            $(document).ready(function () {
+
+                //Validate admin rights
+                $.ajax({
+                    type: "POST",
+                    url: "adminsvc.php",
+                    data: {'action': 'checkAdmin'},
+                    dataType: "json",
+                    success: function (response)
+                    {
+                        if(response.success != 'true')
+                        {
+                            window.location = "http://firemtn.org/ProjH"
+                        }
+                    }
+                });
+            });
+            
+            // Logout button click
+            $('#btn_logout').click(function() {
+                $.ajax({
+                    type: "POST",
+                    url: "../registration/registrationsvc.php",
+                    data: {'action': 'logout'},
+                    dataType: "json",
+                    success: function (response)
+                    {
+                        if(response.success == 'true')
+                        {
+                            window.location = "http://firemtn.org/ProjH"
+                        }
+                    }
+                });
+            });
+        </script>
+    </body>
+</html>
