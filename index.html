@@ -2,6 +2,7 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"/>
         <title>Fire Mountain Merit Badge Registration</title>
         <link rel="stylesheet" href="styles/bootstrap.min.css" type="text/css" media="all">
         <link href="styles/signin.css" rel="stylesheet" />
@@ -14,7 +15,7 @@
         <header>
             <h2>Fire Mountain</h2>
             <h2>Merit Badge Registration</h2>
-            <div id="logo_container" class="pull-right"><img src="http://firemtn.org/images/fm_round_logo.png" alt=""></div>
+            <div id="logo_container" class="pull-right"><img src="http://firemtn.org/images/fm_logo_new_full_color_no_words.png" alt=""></div>
         </header>
         </section>
       <form id="frm_login" class="form-signin" method="POST" action="./registration">
@@ -31,6 +32,8 @@
         </div>
         -->
         <button id="btn_login" class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
+        <br />
+        <p><a href="forgot">Password reset</a></p>
         <div id="error_msg"></div>
       </form>
     </div>
@@ -48,11 +51,11 @@
                             {
                                 if(response.valid == 'true' && response.admin == 1)
                                 {
-                                    window.location = "http://firemtn.org/ProjH/administration"
+                                    window.location = "./administration"
                                 }
                                 else if(response.valid == 'true')
                                 {
-                                    window.location = "http://firemtn.org/ProjH/registration"
+                                    window.location = "./registration"
                                 }
                                 else
                                 {

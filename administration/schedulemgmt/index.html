@@ -3,14 +3,14 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
         <title>Fire Mountain Merit Badge Registration</title>
-        <link rel="stylesheet" href="../styles/bootstrap.min.css" type="text/css" media="all">
-        <link href="../styles/jquery.bootgrid.min.css" rel="stylesheet" />
-        <link href="../styles/styles.css" rel="stylesheet" />
-        <script src="../scripts/jquery-3.2.1.min.js"></script>
-        <script src="../scripts/bootstrap.min.js"></script>
-        <script src="../scripts/jquery.bootgrid.min.js"></script>
-        <script src="../scripts/angular.min.js"></script>
-        <script src="../scripts/angular-messages.min.js"></script>
+        <link rel="stylesheet" href="../../styles/bootstrap.min.css" type="text/css" media="all">
+        <link href="../../styles/jquery.bootgrid.min.css" rel="stylesheet" />
+        <link href="../../styles/styles.css" rel="stylesheet" />
+        <script src="../../scripts/jquery-3.2.1.min.js"></script>
+        <script src="../../scripts/bootstrap.min.js"></script>
+        <script src="../../scripts/jquery.bootgrid.min.js"></script>
+        <script src="../../scripts/angular.min.js"></script>
+        <script src="../../scripts/angular-messages.min.js"></script>
     </head>
     <body ng-app="app" ng-controller="formCtrl" id="mycontroller">
         <div class="container">
@@ -33,10 +33,10 @@
                         </div>
                     </div>
                     <ul>
-                        <li><a class="active" href="./">Home</a></li>
-                        <li><a href="./schedulemgmt">Schedule View/Generate</a></li>
+                        <li><a href="../">Home</a></li>
+                        <li><a class="active" href="./">Schedule View/Generate</a></li>
                     </ul>
-                    <p>This area will contain charts and metrics about registration.</p>
+                    <p>Weekly schedules by class and troop.</p>
                 </div>
             </div>
         </div>
@@ -52,14 +52,14 @@
                 //Validate admin rights
                 $.ajax({
                     type: "POST",
-                    url: "adminsvc.php",
+                    url: "schedulesvc.php",
                     data: {'action': 'checkAdmin'},
                     dataType: "json",
                     success: function (response)
                     {
                         if(response.success != 'true')
                         {
-                            window.location = "../"
+                            window.location = "../../"
                         }
                     }
                 });
@@ -69,14 +69,14 @@
             $('#btn_logout').click(function() {
                 $.ajax({
                     type: "POST",
-                    url: "../registration/registrationsvc.php",
+                    url: "../../registration/registrationsvc.php",
                     data: {'action': 'logout'},
                     dataType: "json",
                     success: function (response)
                     {
                         if(response.success == 'true')
                         {
-                            window.location = "../"
+                            window.location = "../../"
                         }
                     }
                 });

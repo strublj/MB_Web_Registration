@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"/>
+        <title>Fire Mountain Merit Badge Registration</title>
+        <link rel="stylesheet" href="../styles/bootstrap.min.css" type="text/css" media="all">
+        <link href="../styles/jquery.bootgrid.min.css" rel="stylesheet" />
+        <link href="../styles/styles.css" rel="stylesheet" />
+        <script src="../scripts/jquery-3.2.1.min.js"></script>
+        <script src="../scripts/bootstrap.min.js"></script>
+        <script src="../scripts/jquery.bootgrid.min.js"></script>
+        <script src="../scripts/angular.min.js"></script>
+        <script src="../scripts/angular-messages.min.js"></script>
+    </head>
+    <body ng-app="app" ng-controller="formCtrl" id="mycontroller">
+        <div class="container">
+            <section id="intro">
+                <header>
+                    <h2>Fire Mountain</h2>
+                    <h2>Merit Badge Registration</h2>
+                    <div id="logo_container" class="pull-right"><img src="http://firemtn.org/images/fm_logo_new_full_color_no_words.png" alt=""></div>
+                </header>
+            </section>  
+            <div class="">
+                <div class="col-sm-12">
+                    <div class="well clearfix">
+                        <div class="pull-left">
+                            <h2 id="reg_title">Class List Details</h2>
+                            <a href="https://www.mountbakerbsa.org/camping/fire-mountain-scout-camp/" target="_blank">Registration Frequently Asked Questions</a>
+                        </div>
+                        <div class="pull-right" style="padding-top: 25px">
+                            <button type="button" class="btn btn-xs btn-primary" id="btn_logout" data-row-id="0">
+                                <span class="glyphicon glyphicon-asterisk"></span>Logout</button>
+                        </div>
+                    </div>
+                    <table id="class_list_grid" class="table table-condensed table-hover table-striped" width="90%" cellspacing="0" data-toggle="bootgrid">
+                        <thead>
+                            <tr>
+                                <th data-column-id="mb_name" data-width="20%">Class</th>
+                                <th data-column-id="is_eagle_req" data-width="9%" data-css-class="hidden-xs hidden-sm" data-header-css-class="hidden-xs hidden-sm">Eagle?</th>
+                                <th data-column-id="is_stem" data-width="9%" data-css-class="hidden-xs hidden-sm" data-header-css-class="hidden-xs hidden-sm">STEM?</th>
+                                <th data-column-id="area" data-width="18%" data-css-class="hidden-xs hidden-sm" data-header-css-class="hidden-xs hidden-sm">Area</th>
+                                <th data-column-id="cost" data-width="12%">Addl Cost</th>
+                                <th data-column-id="min_age" data-width="10%">Min Age</th>
+                                <th data-column-id="pre_req" data-width="12%">Pre Reqs</th>
+                                <th data-column-id="mb_notes" data-width="12%">Notes</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <script type="text/javascript">
+            var app = angular.module('app', ['ngMessages']);
+            app.controller('formCtrl', function($scope, $http) {
+                
+            });
+            
+            $(document).ready(function () {
+                /*
+                 * jQuery Bootgrid control setup
+                 * 
+                 * http://www.jquery-bootgrid.com/Documentation
+                 */
+                var grid = $("#class_list_grid").bootgrid({
+                    ajax: true,
+                    rowSelect: false,
+                    rowCount: -1, // Disable pagination (returns all rows)
+                    navigation: 0,
+                    post: function ()
+                    {
+                        /* To accumulate custom parameter with the request object */
+                        return {
+                            id: "b0df282a-0d67-40e5-8558-c9e93b7befed"
+                        };
+                    },
+
+                    url: "classlistsvc.php"
+                });
+
+                // Logout button click
+                $('#btn_logout').click(function() {
+                    $.ajax({
+                        type: "POST",
+                        url: "../registration/registrationsvc.php",
+                        data: {'action': 'logout'},
+                        dataType: "json",
+                        success: function (response)
+                        {
+                            window.location = "../"
+                        }
+                    });
+                });
+
+            });
+        </script>
+    </body>
+</html>

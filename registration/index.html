@@ -2,6 +2,7 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"/>
         <title>Fire Mountain Merit Badge Registration</title>
         <link rel="stylesheet" href="../styles/bootstrap.min.css" type="text/css" media="all">
         <link href="../styles/jquery.bootgrid.min.css" rel="stylesheet" />
@@ -12,13 +13,13 @@
         <script src="../scripts/angular.min.js"></script>
         <script src="../scripts/angular-messages.min.js"></script>
     </head>
-    <body ng-app="app" ng-controller="formCtrl">
+    <body ng-app="app" ng-controller="formCtrl" id="mycontroller">
         <div class="container">
             <section id="intro">
                 <header>
                     <h2>Fire Mountain</h2>
                     <h2>Merit Badge Registration</h2>
-                    <div id="logo_container" class="pull-right"><img src="http://firemtn.org/images/fm_round_logo.png" alt=""></div>
+                    <div id="logo_container" class="pull-right"><img src="http://firemtn.org/images/fm_logo_new_full_color_no_words.png" alt=""></div>
                 </header>
             </section>  
             <div class="">
@@ -26,7 +27,8 @@
                     <div class="well clearfix">
                         <div class="pull-left">
                             <h2 id="reg_title"></h2>
-                            <a href="https://www.mountbakerbsa.org/camping/fire-mountain-scout-camp/" target="_blank">Registration Frequently Asked Questions</a>
+                            <p><a href="https://www.mountbakerbsa.org/camping/fire-mountain-scout-camp/" target="_blank">Registration Frequently Asked Questions</a></p>
+                            <p><a href="../classlist" target="_blank">Class List Details</a></p>
                         </div>
                         <div class="pull-right" style="padding-top: 25px">
                             <button type="button" class="btn btn-xs btn-primary" id="btn_logout" data-row-id="0">
@@ -41,18 +43,18 @@
                                 <th data-column-id="scout_last">Last</th>
                                 <th data-column-id="scout_age" data-visible="false">Age</th>
                                 <th data-column-id="scout_rank" data-visible="false">Rank</th>
-                                <th data-column-id="scout_pref1">1st</th>
-                                <th data-column-id="scout_pref2">2nd</th>
-                                <th data-column-id="scout_pref3">3rd</th>
-                                <th data-column-id="scout_pref4">4th</th>
-                                <th data-column-id="scout_pref5">5th</th>
-                                <th data-column-id="scout_pref6">6th</th>
+                                <th data-column-id="scout_pref1" data-css-class="hidden-xs hidden-sm" data-header-css-class="hidden-xs hidden-sm">1st</th>
+                                <th data-column-id="scout_pref2" data-css-class="hidden-xs hidden-sm" data-header-css-class="hidden-xs hidden-sm">2nd</th>
+                                <th data-column-id="scout_pref3" data-css-class="hidden-xs hidden-sm" data-header-css-class="hidden-xs hidden-sm">3rd</th>
+                                <th data-column-id="scout_pref4" data-css-class="hidden-xs hidden-sm" data-header-css-class="hidden-xs hidden-sm">4th</th>
+                                <th data-column-id="scout_pref5" data-css-class="hidden-xs hidden-sm" data-header-css-class="hidden-xs hidden-sm">5th</th>
+                                <th data-column-id="scout_pref6" data-css-class="hidden-xs hidden-sm" data-header-css-class="hidden-xs hidden-sm">6th</th>
                                 <th data-column-id="commands" data-formatter="commands" data-sortable="false"></th>
                             </tr>
                         </thead>
                     </table>
                     <div class="pull-left" style="padding-top: 25px">
-                            <button type="button" class="btn btn-xs btn-primary" id="btn_add_modal" data-row-id="0">
+                            <button type="button" class="btn btn-xs btn-primary" id="btn_add_modal" data-row-id="0" ng-click="add_reset()">
                                 <span class="glyphicon glyphicon-plus"></span>Add Scout</button>
                         </div>
                 </div>
@@ -85,43 +87,57 @@
                             </div>
                             <div class="form-group">
                                 <label for="age" class="control-label">Age:</label>
-                                <input type="text" class="form-control numbersOnly" id="age" name="age" ng-model="age" required/>
+                                <input type="text" class="form-control numbersOnly" id="age" name="age" ng-model="age" ng-blur="ageChange(age)" required/>
                                 <div ng-messages="frm_add.age.$error" ng-if="frm_add.age.$touched">
                                     <div ng-message="required" class="help-block">Age is required</div>
                                 </div>
                             </div>
                             <div class="form-group">
                                 <label for="rank" class="control-label">Rank:</label>
-                                <select class="form-control" id="rank" name="rank"></select>
+                                <select class="form-control" id="rank" name="rank" ng-model="rank" ng-options="rank.rank_name for rank in Ranks track by rank.rank_id">
+                                    <option value="">Select rank</option>
+                                </select>
                             </div>
                             <div class="form-group">
                                 <label for="pref1" class="control-label">1st Preference:</label>
-                                <select class="form-control" id="pref1" name="pref1"></select>
+                                <select class="form-control" id="pref1" name="pref1" ng-model="pref1_class" ng-options="pref1_class.class_name for pref1_class in Classes track by pref1_class.class_id">
+                                    <option value="">Select preference</option>
+                                </select>
                             </div>
                             <div class="form-group">
                                 <label for="pref2" class="control-label">2nd Preference:</label>
-                                <select class="form-control" id="pref2" name="pref2"></select>
+                                <select class="form-control" id="pref2" name="pref2" ng-model="pref2_class" ng-options="pref2_class.class_name for pref2_class in Classes track by pref2_class.class_id">
+                                    <option value="">Select preference</option>
+                                </select>
                             </div>
                             <div class="form-group">
                                 <label for="pref3" class="control-label">3rd Preference:</label>
-                                <select class="form-control" id="pref3" name="pref3"></select>
+                                <select class="form-control" id="pref3" name="pref3" ng-model="pref3_class" ng-options="pref3_class.class_name for pref3_class in Classes track by pref3_class.class_id">
+                                    <option value="">Select preference</option>
+                                </select>
                             </div>
                             <div class="form-group">
                                 <label for="pref4" class="control-label">4th Preference:</label>
-                                <select class="form-control" id="pref4" name="pref4"></select>
+                                <select class="form-control" id="pref4" name="pref4" ng-model="pref4_class" ng-options="pref4_class.class_name for pref4_class in Classes track by pref4_class.class_id">
+                                    <option value="">Select preference</option>
+                                </select>
                             </div>
                             <div class="form-group">
                                 <label for="pref5" class="control-label">5th Preference:</label>
-                                <select class="form-control" id="pref5" name="pref5"></select>
+                                <select class="form-control" id="pref5" name="pref5" ng-model="pref5_class" ng-options="pref5_class.class_name for pref5_class in Classes track by pref5_class.class_id">
+                                    <option value="">Select preference</option>
+                                </select>
                             </div>
                             <div class="form-group">
                                 <label for="pref6" class="control-label">6th Preference:</label>
-                                <select class="form-control" id="pref6" name="pref6"></select>
+                                <select class="form-control" id="pref6" name="pref6" ng-model="pref6_class" ng-options="pref6_class.class_name for pref6_class in Classes track by pref6_class.class_id">
+                                    <option value="">Select preference</option>
+                                </select>
                             </div>
                     </div>
                     <div id="error_msg"></div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-default" data-dismiss="modal" ng-click="add_reset()">Cancel</button>
+                        <button type="button" class="btn btn-default" data-dismiss="modal" >Cancel</button>
                         <button type="button" id="btn_add" class="btn btn-primary">Save</button>
                     </div>
                     </form>
@@ -155,38 +171,52 @@
                             </div>
                             <div class="form-group">
                                 <label for="age" class="control-label">Age:</label>
-                                <input type="text" class="form-control numbersOnly" id="edit_age" name="edit_age" ng-model="edit_age" required/>
+                                <input type="text" class="form-control numbersOnly" id="edit_age" name="edit_age" ng-model="edit_age" ng-blur="ageChange(edit_age)" required/>
                                 <div ng-messages="frm_edit.edit_age.$error" ng-if="frm_edit.edit_age.$touched">
                                     <div ng-message="required" class="help-block">Age is required</div>
                                 </div>
                             </div>
                             <div class="form-group">
                                 <label for="rank" class="control-label">Rank:</label>
-                                <select class="form-control" id="edit_rank" name="edit_rank"></select>
+                                <select class="form-control" id="edit_rank" name="edit_rank" ng-model="rank" ng-options="rank.rank_name for rank in Ranks track by rank.rank_id">
+                                    <option value="">Select rank</option>
+                                </select>
                             </div>
                             <div class="form-group">
                                 <label for="pref1" class="control-label">1st Preference:</label>
-                                <select class="form-control" id="edit_pref1" name="edit_pref1"></select>
+                                <select class="form-control" id="edit_pref1" name="edit_pref1" ng-model="pref1_class" ng-options="pref1_class.class_name for pref1_class in Classes track by pref1_class.class_id">
+                                    <option value="">Select preference</option>
+                                </select>
                             </div>
                             <div class="form-group">
                                 <label for="pref2" class="control-label">2nd Preference:</label>
-                                <select class="form-control" id="edit_pref2" name="edit_pref2"></select>
+                                <select class="form-control" id="edit_pref2" name="edit_pref2" ng-model="pref2_class" ng-options="pref2_class.class_name for pref2_class in Classes track by pref2_class.class_id">
+                                    <option value="">Select preference</option>
+                                </select>
                             </div>
                             <div class="form-group">
                                 <label for="pref3" class="control-label">3rd Preference:</label>
-                                <select class="form-control" id="edit_pref3" name="edit_pref3"></select>
+                                <select class="form-control" id="edit_pref3" name="edit_pref3" ng-model="pref3_class" ng-options="pref3_class.class_name for pref3_class in Classes track by pref3_class.class_id">
+                                    <option value="">Select preference</option>
+                                </select>
                             </div>
                             <div class="form-group">
                                 <label for="pref4" class="control-label">4th Preference:</label>
-                                <select class="form-control" id="edit_pref4" name="edit_pref4"></select>
+                                <select class="form-control" id="edit_pref4" name="edit_pref4" ng-model="pref4_class" ng-options="pref4_class.class_name for pref4_class in Classes track by pref4_class.class_id">
+                                    <option value="">Select preference</option>
+                                </select>
                             </div>
                             <div class="form-group">
                                 <label for="pref5" class="control-label">5th Preference:</label>
-                                <select class="form-control" id="edit_pref5" name="edit_pref5"></select>
+                                <select class="form-control" id="edit_pref5" name="edit_pref5" ng-model="pref5_class" ng-options="pref5_class.class_name for pref5_class in Classes track by pref5_class.class_id">
+                                    <option value="">Select preference</option>
+                                </select>
                             </div>
                             <div class="form-group">
                                 <label for="pref6" class="control-label">6th Preference:</label>
-                                <select class="form-control" id="edit_pref6" name="edit_pref6"></select>
+                                <select class="form-control" id="edit_pref6" name="edit_pref6" ng-model="pref6_class" ng-options="pref6_class.class_name for pref6_class in Classes track by pref6_class.class_id">
+                                    <option value="">Select preference</option>
+                                </select>
                             </div>
                     </div>
                     <div class="modal-footer">
@@ -198,7 +228,7 @@
             </div>
         </div>
         <div id="delete_model" class="modal fade">
-            <div class="modal-dialog">
+            <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content">
                     <div class="modal-header">
                         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
@@ -220,36 +250,74 @@
         </div>
         <script type="text/javascript">
             var app = angular.module('app', ['ngMessages']);
-            app.controller('formCtrl', function($scope) {
+            app.controller('formCtrl', function($scope, $http) {
+                /*
+                 * Resets the fields on the Add modal dialog.
+                 * Clears all of the validation indicators and error messages.
+                 * Clears the list of classes and resets all to their default options.
+                 */
                 $scope.add_reset = function() {
                     this.frm_add.$setPristine();
                     this.frm_add.$setUntouched();
                     $('#error_msg').html('');
+                    
+                    $scope.first = "";
+                    $scope.last = "";
+                    $scope.age = "";
+                    $scope.rank = "";
+                    $scope.pref1_class = "";
+                    $scope.pref2_class = "";
+                    $scope.pref3_class = "";
+                    $scope.pref4_class = "";
+                    $scope.pref5_class = "";
+                    $scope.pref6_class = "";
+                    $scope.Classes = "";
                 };
+                
+                /*
+                 * Gets the list of classes based on the age being registered,
+                 * updates the Classes object based on the call to the service.
+                 */
+                $scope.ageChange = function(age) {
+                  $http.get("registrationsvc.php?action=classList&age=" + age)
+                    .then(function(response) {
+                        $scope.Classes = response.data;
+                    });
+                };
+                
+                /*
+                 * Sets up the Edit modal dialog fields with the values from the
+                 * service.  Calls the ageChange() function to load the list of classes
+                 * based on the age being registered, then sets all the select
+                 * boxes to the values saved for this record.
+                 */
+                $scope.setEdit = function(response) {
+                    $scope.ageChange(response.scout_age);
+                    $('#edit_scout_id').val(response.scout_id);
+                    $scope.edit_first = response.scout_first;
+                    $scope.edit_last = response.scout_last;
+                    $scope.edit_age = response.scout_age;
+                    $scope.rank = {rank_id: response.scout_rank_id, rank_name: response.scout_rank};
+                    $scope.pref1_class = {class_id: response.scout_pref1_id, class_name: response.scout_pref1};
+                    $scope.pref2_class = {class_id: response.scout_pref2_id, class_name: response.scout_pref2};
+                    $scope.pref3_class = {class_id: response.scout_pref3_id, class_name: response.scout_pref3};
+                    $scope.pref4_class = {class_id: response.scout_pref4_id, class_name: response.scout_pref4};
+                    $scope.pref5_class = {class_id: response.scout_pref5_id, class_name: response.scout_pref5};
+                    $scope.pref6_class = {class_id: response.scout_pref6_id, class_name: response.scout_pref6};
+                };
+        
+                /*
+                 * Sets the Ranks object to the list of ranks returned from the service.
+                 */
+                $http.get("registrationsvc.php?action=rankList")
+                    .then(function(response) {
+                        $scope.Ranks = response.data;
+                    });
             });
             
             $(document).ready(function () {
 
-                //Helper to load dropdown lists with provided data
-                function loadClassList(selID, data, defaultText) {
-                    $("#" + selID).get(0).options.length = 0;
-                                $("#" + selID).get(0).options[0] = new Option(defaultText, "-1");   
-         
-                                $.each(data, function (index, item) {
-                                        $("#" + selID).get(0).options[$("#" + selID).get(0).options.length] = new Option(item.class_name, item.class_id);
-                                });
-                }
-                
-                function loadRankList(selID, data, defaultText) {
-                    $("#" + selID).get(0).options.length = 0;
-                                $("#" + selID).get(0).options[0] = new Option(defaultText, "-1");   
-         
-                                $.each(data, function (index, item) {
-                                        $("#" + selID).get(0).options[$("#" + selID).get(0).options.length] = new Option(item.rank_name, item.rank_id);
-                                });
-                }
-
-                //Load each of the dropdown boxes on the Add/Edit modal boxes
+                //Validate login token and set banner text
                 $.ajax({
                     type: "POST",
                     url: "registrationsvc.php",
@@ -264,44 +332,8 @@
                         }
                         else
                         {
-                            window.location = "http://firemtn.org/ProjH"
+                            window.location = "../"
                         }
-                    }
-                });
-
-                //Load each of the dropdown boxes on the Add/Edit modal boxes
-                $.ajax({
-                    type: "POST",
-                    url: "registrationsvc.php",
-                    data: {'action': 'classList'},
-                    dataType: "json",
-                    success: function (response)
-                    {
-                        loadClassList("pref1", response, "Select preference");
-                        loadClassList("pref2", response, "Select preference");
-                        loadClassList("pref3", response, "Select preference");
-                        loadClassList("pref4", response, "Select preference");
-                        loadClassList("pref5", response, "Select preference");
-                        loadClassList("pref6", response, "Select preference");
-                        loadClassList("edit_pref1", response, "Select preference");
-                        loadClassList("edit_pref2", response, "Select preference");
-                        loadClassList("edit_pref3", response, "Select preference");
-                        loadClassList("edit_pref4", response, "Select preference");
-                        loadClassList("edit_pref5", response, "Select preference");
-                        loadClassList("edit_pref6", response, "Select preference");
-                    }
-                });
-
-                //Load each of the dropdown boxes on the Add/Edit modal boxes
-                $.ajax({
-                    type: "POST",
-                    url: "registrationsvc.php",
-                    data: {'action': 'rankList'},
-                    dataType: "json",
-                    success: function (response)
-                    {
-                        loadRankList("rank", response, "Select rank");
-                        loadRankList("edit_rank", response, "Select rank");
                     }
                 });
 
@@ -350,32 +382,8 @@
                                 dataType: "json",
                                 success: function (response)
                                 {
-                                    // Setup data from record in Edit form
-                                    $('#edit_scout_id').val(response.scout_id);
-                                    $('#edit_first').val(response.scout_first);
-                                    $('#edit_last').val(response.scout_last);
-                                    $('#edit_age').val(response.scout_age);
-                                    $('#edit_rank option').filter(function() { 
-                                            return this.text == response.scout_rank;
-                                        }).prop('selected', 'selected');
-                                    $('#edit_pref1 option').filter(function() { 
-                                            return this.text == response.scout_pref1;
-                                        }).prop('selected', 'selected');
-                                    $('#edit_pref2 option').filter(function() { 
-                                            return this.text == response.scout_pref2;
-                                        }).prop('selected', 'selected'); 
-                                    $('#edit_pref3 option').filter(function() { 
-                                            return this.text == response.scout_pref3;
-                                        }).prop('selected', 'selected'); 
-                                    $('#edit_pref4 option').filter(function() { 
-                                            return this.text == response.scout_pref4;
-                                        }).prop('selected', 'selected'); 
-                                    $('#edit_pref5 option').filter(function() { 
-                                            return this.text == response.scout_pref5;
-                                        }).prop('selected', 'selected'); 
-                                    $('#edit_pref6 option').filter(function() { 
-                                            return this.text == response.scout_pref6;
-                                        }).prop('selected', 'selected'); 
+                                    angular.element('#mycontroller').scope().setEdit(response);
+                                    angular.element('#mycontroller').scope().$apply();
                                 }
                             });                    
                         } 
@@ -413,19 +421,7 @@
                 });
 
                 // Add operations
-                $("#btn_add_modal").click(function () {
-                    // Reset form to default values
-                    $('#first').val('');
-                    $('#last').val('');
-                    $('#age').val('');
-                    $('#rank').prop('selectedIndex', 0);
-                    $('#pref1').prop('selectedIndex', 0);
-                    $('#pref2').prop('selectedIndex', 0);
-                    $('#pref3').prop('selectedIndex', 0);
-                    $('#pref4').prop('selectedIndex', 0);
-                    $('#pref5').prop('selectedIndex', 0);
-                    $('#pref6').prop('selectedIndex', 0);
-                        
+                $("#btn_add_modal").click(function () { 
                     $('#add_model').modal('show');
                 });
                 $("#btn_add").click(function () {
@@ -460,7 +456,7 @@
                         {
                             if(response.success == 'true')
                             {
-                                window.location = "http://firemtn.org/ProjH"
+                                window.location = "../"
                             }
                         }
                     });

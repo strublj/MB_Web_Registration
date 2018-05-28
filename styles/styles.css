@@ -59,13 +59,46 @@ header, section {
             margin-right: 10px;
         }
         
+        #class_list_grid td {
+            white-space: normal;
+        }
+        
+ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: #333;
+}
+
+li {
+    float: left;
+}
+
+li a {
+    display: block;
+    color: white;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+}
+
+li a:hover:not(.active) {
+    background-color: #111;
+}
+
+.active {
+    background-color: #0059b3;
+}
+        
 @media (max-width: 1000px) {
     
     /* intro */
 
     #intro h2, #intro p {
         position: relative;
-        width: 70%;
+        width: 100%;
+        font-size: 20px;
     }
 
     #intro h2 {
@@ -78,4 +111,14 @@ header, section {
         padding: 0;
         color: #d6a965;
     }
+    
+    #reg_title {
+        font-size: 20px;    
+    }
+    
+    body, select, textarea, input[type="text"], input[type="password"],
+    input[type="datetime"], input[type="datetime-local"],
+    input[type="date"], input[type="month"], input[type="time"],
+    input[type="week"], input[type="number"], input[type="email"],
+    input[type="url"]{ font-size: 16px; }
 }

@@ -38,6 +38,12 @@ body {
   border-top-left-radius: 0;
   border-top-right-radius: 0;
 }
+
+#inputUsernameReset {
+  margin-bottom: 10px;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
     
 #intro {
 	position: relative;
@@ -93,7 +99,8 @@ body {
 
     #intro h2, #intro p {
         position: relative;
-        width: 70%;
+        width: 100%;
+        font-size: 20px;
     }
 
     #intro h2 {
@@ -106,4 +113,20 @@ body {
         padding: 0;
         color: #d6a965;
     }
+    
+    .form-signin {
+        max-width: 100%;
+        padding: 1px;
+    }
+    
+    .container {
+        max-width: 100%;
+        width: 100%;
+    }
+    
+    body, select, textarea, input[type="text"], input[type="password"],
+    input[type="datetime"], input[type="datetime-local"],
+    input[type="date"], input[type="month"], input[type="time"],
+    input[type="week"], input[type="number"], input[type="email"],
+    input[type="url"]{ font-size: 16px; }
 }

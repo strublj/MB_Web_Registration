@@ -61,6 +61,9 @@ class Scout {
 
     protected $data = array();
 
+    private $salt1 = "p@!gH";
+    private $salt2 = "ABx$3";
+    
     function __construct() {
         
     }
@@ -72,7 +75,14 @@ class Scout {
     public function getListOfClasses($params, $servername, $username, $password, $dbname) {
         
         $conn = new mysqli($servername, $username, $password, $dbname);
-        $sql = "SELECT mb_id, mb_name FROM merit_badge ORDER BY mb_name ASC";
+        if(empty($params["age"]))
+        {
+            $sql = "SELECT mb_id, mb_name FROM merit_badge ORDER BY mb_name ASC";
+        }
+        else
+        {
+            $sql = "SELECT mb_id, mb_name FROM merit_badge WHERE " . $params["age"] . " >= min_age OR min_age IS NULL ORDER BY mb_name ASC";
+        }
         $result = $conn->query($sql);
         
         if($result->num_rows > 0)
@@ -329,9 +339,10 @@ class Scout {
     function getIndividualScoutRegistration($params, $servername, $username, $password, $dbname) {
         
         $conn = new mysqli($servername, $username, $password, $dbname);
-        $sql = "SELECT sc.scout_id, sc.first_name, sc.last_name, br.rank_name, " .
-                       "sc.age, mb1.mb_name AS mb_pref1, mb2.mb_name AS mb_pref2, " .
-                       "mb3.mb_name AS mb_pref3, mb4.mb_name AS mb_pref4, mb5.mb_name AS mb_pref5, mb6.mb_name AS mb_pref6 " .
+        $sql = "SELECT sc.scout_id, sc.first_name, sc.last_name, sc.rank_id, br.rank_name, " .
+                       "sc.age, sc.pref1_mb_id, mb1.mb_name AS mb_pref1, sc.pref2_mb_id, mb2.mb_name AS mb_pref2, " .
+                       "sc.pref3_mb_id, mb3.mb_name AS mb_pref3, sc.pref4_mb_id, mb4.mb_name AS mb_pref4, " .
+                        "sc.pref5_mb_id, mb5.mb_name AS mb_pref5, sc.pref6_mb_id, mb6.mb_name AS mb_pref6 " .
                 "FROM scout sc " .
                 "LEFT JOIN bsa_rank br ON sc.rank_id = br.rank_id " .
                 "LEFT JOIN merit_badge mb1 ON sc.pref1_mb_id = mb1.mb_id " .
@@ -352,12 +363,19 @@ class Scout {
                 "scout_first" => $row[first_name],
                 "scout_last" => $row[last_name],
                 "scout_age" => $row[age],
+                "scout_rank_id" => $row[rank_id],
                 "scout_rank" => $row[rank_name],
+                "scout_pref1_id" => $row[pref1_mb_id],
                 "scout_pref1" => $row[mb_pref1],
+                "scout_pref2_id" => $row[pref2_mb_id],
                 "scout_pref2" => $row[mb_pref2],
+                "scout_pref3_id" => $row[pref3_mb_id],
                 "scout_pref3" => $row[mb_pref3],
+                "scout_pref4_id" => $row[pref4_mb_id],
                 "scout_pref4" => $row[mb_pref4],
+                "scout_pref5_id" => $row[pref5_mb_id],
                 "scout_pref5" => $row[mb_pref5],
+                "scout_pref6_id" => $row[pref6_mb_id],
                 "scout_pref6" => $row[mb_pref6]
             );
         }
@@ -368,12 +386,19 @@ class Scout {
                 "scout_first" => "",
                 "scout_last" => "",
                 "scout_age" => "",
+                "scout_rank_id" => "",
                 "scout_rank" => "",
+                "scout_pref1_id" => "",
                 "scout_pref1" => "",
+                "scout_pref2_id" => "",
                 "scout_pref2" => "",
+                "scout_pref3_id" => "",
                 "scout_pref3" => "",
+                "scout_pref4_id" => "",
                 "scout_pref4" => "",
+                "scout_pref5_id" => "",
                 "scout_pref5" => "",
+                "scout_pref6_id" => "",
                 "scout_pref6" => ""
             );
         }
@@ -403,11 +428,10 @@ class Scout {
         $sql =  "INSERT INTO scout " . 
                 "(first_name, last_name, age, rank_id, unit_id, pref1_mb_id, pref2_mb_id, pref3_mb_id, pref4_mb_id, pref5_mb_id, pref6_mb_id) " .
                 "SELECT '" . $params["first"] . "', '" . $params["last"] . "', " . $params["age"] . 
-                ", IF(" . $params["rank"] . " < 0, NULL, " . $params["rank"] . "), ma.unit_id, IF(" . $params["pref1"] . 
-                " < 0, NULL, " . $params["pref1"] . "), IF(" . $params["pref2"] . " < 0, NULL, " . $params["pref2"] . 
-                "), IF(" . $params["pref3"] . " < 0, NULL, " . $params["pref3"] . "), IF(" . $params["pref4"] . 
-                " < 0, NULL, " . $params["pref4"] . "), IF(" . $params["pref5"] . " < 0, NULL, " . $params["pref5"] . 
-                "), IF(" . $params["pref6"] . " < 0, NULL, " . $params["pref6"] . ") FROM mbreg_account ma WHERE ma.uuid = '" . $authToken . "'";
+                ", " . (empty($params["rank"]) ? 'NULL' : $params["rank"]) . ", ma.unit_id, " . (empty($params["pref1"]) ? 'NULL' : $params["pref1"]) . 
+                ", " . (empty($params["pref2"]) ? 'NULL' : $params["pref2"]) . ", " . (empty($params["pref3"]) ? 'NULL' : $params["pref3"]) . 
+                ", " . (empty($params["pref4"]) ? 'NULL' : $params["pref4"]) . ", " . (empty($params["pref5"]) ? 'NULL' : $params["pref5"]) . 
+                ", " . (empty($params["pref6"]) ? 'NULL' : $params["pref6"]) . " FROM mbreg_account ma WHERE ma.uuid = '" . $authToken . "'";
         $conn->query($sql);
         $conn->close();
         
@@ -439,14 +463,14 @@ class Scout {
         $sql =  "UPDATE scout SET " . 
                 "first_name = '" . $params["edit_first"] . "', " . 
                 "last_name = '" . $params["edit_last"] . "', " .
-                "rank_id = IF(" . $params["edit_rank"] . " < 0, NULL, " . $params["edit_rank"] . "), " .
+                "rank_id = " . (empty($params["edit_rank"]) ? 'NULL' : $params["edit_rank"]) . ", " .
                 "age = " . $params["edit_age"] . ", " .
-                "pref1_mb_id = IF(" . $params["edit_pref1"] . " < 0, NULL, " . $params["edit_pref1"] . "), " .
-                "pref2_mb_id = IF(" . $params["edit_pref2"] . " < 0, NULL, " . $params["edit_pref2"] . "), " .
-                "pref3_mb_id = IF(" . $params["edit_pref3"] . " < 0, NULL, " . $params["edit_pref3"] . "), " .
-                "pref4_mb_id = IF(" . $params["edit_pref4"] . " < 0, NULL, " . $params["edit_pref4"] . "), " .
-                "pref5_mb_id = IF(" . $params["edit_pref5"] . " < 0, NULL, " . $params["edit_pref5"] . "), " .
-                "pref6_mb_id = IF(" . $params["edit_pref6"] . " < 0, NULL, " . $params["edit_pref6"] . ") " .
+                "pref1_mb_id = " . (empty($params["edit_pref1"]) ? 'NULL' : $params["edit_pref1"]) . ", " .
+                "pref2_mb_id = " . (empty($params["edit_pref2"]) ? 'NULL' : $params["edit_pref2"]) . ", " .
+                "pref3_mb_id = " . (empty($params["edit_pref3"]) ? 'NULL' : $params["edit_pref3"]) . ", " .
+                "pref4_mb_id = " . (empty($params["edit_pref4"]) ? 'NULL' : $params["edit_pref4"]) . ", " .
+                "pref5_mb_id = " . (empty($params["edit_pref5"]) ? 'NULL' : $params["edit_pref5"]) . ", " .
+                "pref6_mb_id = " . (empty($params["edit_pref6"]) ? 'NULL' : $params["edit_pref6"]) . " " .
                 "WHERE scout_id = " . $params['edit_scout_id'];
         $conn->query($sql);
         $conn->close();        
@@ -522,9 +546,37 @@ class Scout {
         echo json_encode($this->data);
     }
     
+    /**
+     * Prepares the given string to be passed to a MySQL query.
+     * @param string $var
+     * @return string Ready to be passed to MySQL
+     */
+    function sanitizeMySQL($var, $conn)
+    {
+        $var = mysqli_real_escape_string($conn, $var);
+        $var = $this->sanitizeString($var);
+        return $var;
+    }
+    
+    /**
+    * Uses several PHP functions to sanitize the given string.
+    * @param string $var
+    * @return string Sanitized string
+    */
+   function sanitizeString($var)
+   {
+       $var = stripslashes($var);
+       $var = htmlentities($var);
+       $var = strip_tags($var);
+       return $var;
+   }
+    
     function login($params, $servername, $username, $password, $dbname) {
         $conn = new mysqli($servername, $username, $password, $dbname);
-        $sql = "SELECT uuid, is_admin FROM mbreg_account WHERE login = '" . $params['user'] . "' AND password = '" . $params['password'] . "'";
+        
+        $login_password = md5($salt1 . $params['password'] . $salt2);
+        
+        $sql = "SELECT uuid, is_admin FROM mbreg_account WHERE login = '" . $params['user'] . "' AND password = '" . $this->sanitizeMySQL($login_password, $conn) . "'";
         $result = $conn->query($sql);
         
         $login = array();

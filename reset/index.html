@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"/>
+        <title>Fire Mountain Merit Badge Registration</title>
+        <link rel="stylesheet" href="../styles/bootstrap.min.css" type="text/css" media="all">
+        <link href="../styles/signin.css" rel="stylesheet" />
+        <script src="../scripts/jquery-3.2.1.min.js"></script>
+        <script src="../scripts/bootstrap.min.js"></script>
+    </head>
+    <body>
+    <div class="container">
+        <section id="intro">
+        <header>
+            <h2>Fire Mountain</h2>
+            <h2>Merit Badge Registration</h2>
+            <div id="logo_container" class="pull-right"><img src="http://firemtn.org/images/fm_logo_new_full_color_no_words.png" alt=""></div>
+        </header>
+        </section>
+      <form id="frm_login" class="form-signin" method="POST" >
+        <h2 class="form-signin-heading">Enter New Password</h2>
+        <label for="inputPassword" class="sr-only">Username</label>
+        <input type="password" id="inputPassword" class="form-control" placeholder="New Password" required autofocus>
+        <!--
+        <div class="checkbox">
+          <label>
+            <input type="checkbox" value="remember-me"> Remember me
+          </label>
+        </div>
+        -->
+        <button id="btn_login" class="btn btn-lg btn-primary btn-block" type="submit">Reset Password</button>
+        <br />
+        <p><a href="../">Back to login</a></p>
+        <div id="error_msg"></div>
+      </form>
+    </div>
+
+        <script type="text/javascript">
+            function GetQueryStringParams(sParam)
+            {
+                var sPageURL = window.location.search.substring(1);
+                var sURLVariables = sPageURL.split('&');
+                for (var i = 0; i < sURLVariables.length; i++) 
+                {
+                    var sParameterName = sURLVariables[i].split('=');
+                    if (sParameterName[0] == sParam) 
+                    {
+                        return sParameterName[1];
+                    }
+                }
+            }
+    
+            $(document).ready(function() {
+                $( "#frm_login" ).submit(function( event ) {
+                    event.preventDefault();
+                    var uuid = GetQueryStringParams('uuid');
+                    $.ajax({
+                            type: "POST",
+                            url: "passwordresetsvc.php",
+                            data: {'uuid': uuid, 'password': $('#inputPassword').val()},
+                            dataType: "json",
+                            success: function (response)
+                            {
+                                if(response.success == 'true')
+                                {
+                                    $('#error_msg').html('<h3>Password updated</h3>');
+                                }
+                            }
+                        });
+
+
+                });
+            });
+        </script>
+    </body>
+</html>
