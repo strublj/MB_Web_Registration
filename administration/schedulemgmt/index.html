@@ -14,7 +14,7 @@
     </head>
     <body ng-app="app" ng-controller="formCtrl" id="mycontroller">
         <div class="container">
-            <section id="intro">
+            <section id="intro" class="dont-print">
                 <header>
                     <h2>Fire Mountain</h2>
                     <h2>Merit Badge Registration</h2>
@@ -23,7 +23,7 @@
             </section>  
             <div class="">
                 <div class="col-sm-12">
-                    <div class="well clearfix">
+                    <div class="well clearfix dont-print">
                         <div class="pull-left">
                             <h2 id="admin_title">Merit Badge Registration Administration</h2>
                         </div>
@@ -32,11 +32,39 @@
                                 <span class="glyphicon glyphicon-asterisk"></span>Logout</button>
                         </div>
                     </div>
-                    <ul>
+                    <ul class="dont-print">
                         <li><a href="../">Home</a></li>
                         <li><a class="active" href="./">Schedule View/Generate</a></li>
+                        <li id="Unit_Reg"><a href="../../registration">Unit Registration</a></li>
                     </ul>
-                    <p>Weekly schedules by class and troop.</p>
+                    <div class="inline-form-group dont-print">
+                        <label class="control-label">Select Week:</label>
+                        <select class="form-control inline-form" id="weekSel" name="weekSel" ng-model="weekSelected" ng-options="Week.week_text for Week in Weeks track by Week.week_id" ng-change="weekChanged()">
+                        </select>
+                        <button type="button" class="btn btn-xs btn-primary" id="btn_generate_schedule" data-row-id="0" ng-click="generateSchedule()">
+                                <span class="glyphicon glyphicon-asterisk"></span>Generate / Regenerate Schedule</button>
+                        <button type="button" class="btn btn-xs btn-primary" id="btn_print_schedule" data-row-id="0" ng-click="print()">
+                                <span class="glyphicon glyphicon-print"></span>Print Schedule</button>
+                    </div>
+                    <div class="unit-schedule" ng-repeat="u in Units">
+                        <h2>{{u.unit_type}} {{u.unit_number}} - {{u.council_name}}</h2>
+                        <table class="scout-schedule">
+                            <tr>
+                                <th>Scout</th>
+                                <th>{{u.start1}} - {{u.end1}}</th>
+                                <th>{{u.start2}} - {{u.end2}}</th>
+                                <th>{{u.start3}} - {{u.end3}}</th>
+                                <th>{{u.start4}} - {{u.end4}}</th>
+                            </tr>
+                            <tr ng-repeat="s in u.scout_list">
+                              <td>{{s.first_name}} {{s.last_name}}</td>
+                              <td>{{s.class_list[1].mb_name}}</td>
+                              <td>{{s.class_list[2].mb_name}}</td>
+                              <td>{{s.class_list[3].mb_name}}</td>
+                              <td>{{s.class_list[4].mb_name}}</td>
+                            </tr>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
@@ -44,7 +72,33 @@
         <script type="text/javascript">
             var app = angular.module('app', ['ngMessages']);
             app.controller('formCtrl', function($scope, $http) {
+                /*
+                 * Sets the Weeks
+                 */
+                $http.get("schedulesvc.php?action=getWeeks")
+                    .then(function(response) {
+                        $scope.Weeks = response.data;
+                        $scope.weekSelected = $scope.Weeks[0];
+                        $scope.weekChanged();
+                    });
+                    
+                $scope.weekChanged = function() {
+                  $http.get("schedulesvc.php?action=getScheduleByTroop&week=" + $scope.weekSelected.week_id)
+                    .then(function(response) {
+                        $scope.Units = response.data;
+                    });
+                };
                 
+                $scope.generateSchedule = function() {
+                  $http.get("schedulesvc.php?action=buildSchedule&week=" + $scope.weekSelected.week_id)
+                    .then(function(response) {
+                        $scope.weekChanged();
+                    });
+                };
+                
+                $scope.print = function() {
+                    window.print();
+                };
             });
             
             $(document).ready(function () {
@@ -60,6 +114,10 @@
                         if(response.success != 'true')
                         {
                             window.location = "../../"
+                        }
+                        if(response.hasUnit == 'false')
+                        {
+                            $("#Unit_Reg").hide();
                         }
                     }
                 });

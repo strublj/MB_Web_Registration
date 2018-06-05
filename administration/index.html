@@ -35,6 +35,7 @@
                     <ul>
                         <li><a class="active" href="./">Home</a></li>
                         <li><a href="./schedulemgmt">Schedule View/Generate</a></li>
+                        <li id="Unit_Reg"><a href="../registration">Unit Registration</a></li>
                     </ul>
                     <p>This area will contain charts and metrics about registration.</p>
                 </div>
@@ -60,6 +61,10 @@
                         if(response.success != 'true')
                         {
                             window.location = "../"
+                        }
+                        if(response.hasUnit == 'false')
+                        {
+                            $("#Unit_Reg").hide();
                         }
                     }
                 });

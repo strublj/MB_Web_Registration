@@ -40,29 +40,32 @@ class Admin {
 
     function validateAdmin($params, $servername, $username, $password, $dbname, $authToken) {
         $conn = new mysqli($servername, $username, $password, $dbname);
-        $sql =  "SELECT ma.is_admin " .
+        $sql = "SELECT ma.is_admin, ma.unit_id " .
                 "FROM mbreg_account ma " .
-                "WHERE ma.uuid = '" . $authToken  . "'";
+                "WHERE ma.uuid = '" . $authToken . "'";
         $result = $conn->query($sql);
         
         $ret = array();
         
-        if($result->num_rows > 0)
-        {
+        if ($result->num_rows > 0) {
             $row = $result->fetch_assoc();
-            
-            if($row[is_admin] == 1)
-            {
+
+            if ($row[is_admin] == 1) {
+                $hasUnit = "false";
+                if(!empty($row[unit_id]))
+                {
+                    $hasUnit = "true";
+                }
+                
                 $ret = array(
-                    "success" => "true"
-                ); 
-            }
-            else
-            {
-               setcookie('mbreg_user', '', time() - 3600, '/', 'firemtn.org', FALSE, TRUE);
+                    "success" => "true",
+                    "hasUnit" => $hasUnit
+                );
+            } else {
+                setcookie('mbreg_user', '', time() - 3600, '/', 'firemtn.org', FALSE, TRUE);
                 $ret = array(
                     "success" => "false"
-                ); 
+                );
             }
         }
         else
