@@ -28,8 +28,11 @@ switch ($action) {
     case 'buildSchedule':
         $scheduleCls->buildSchedule($servername, $username, $password, $dbname, $params);
         break;
-    case 'getScheduleByTroop':
-        $scheduleCls->getScheduleByTroop($servername, $username, $password, $dbname, $params);
+    case 'getScheduleByUnit':
+        $scheduleCls->getScheduleByUnit($servername, $username, $password, $dbname, $params);
+        break;
+    case 'getScheduleBySession':
+        $scheduleCls->getScheduleBySession($servername, $username, $password, $dbname, $params);
         break;
     case 'getWeeks':
         $scheduleCls->getListOfWeeks($servername, $username, $password, $dbname);
@@ -78,7 +81,7 @@ class Scheduler {
      *      Scout
      *          Schedule
      */
-    function getScheduleByTroop($servername, $username, $password, $dbname, $params) {
+    function getScheduleByUnit($servername, $username, $password, $dbname, $params) {
         /*
             SELECT sc.first_name, sc.last_name, ut.unit_type, ut.unit_number, cs.start_session_id,  cs.number_of_sessions, mb.mb_name
             FROM schedule sh 
@@ -217,6 +220,72 @@ class Scheduler {
         echo json_encode($this->data);
     }
     
+    /*
+     * Gets the schedule information from the database for the given week and returns
+     * a JSON object in this structure:
+     * 
+     *  Class Session
+     *      Scout
+     */
+    function getScheduleBySession($servername, $username, $password, $dbname, $params) {
+        
+        $week = $params['week'];
+        
+        $conn = new mysqli($servername, $username, $password, $dbname);
+        
+        $sql =  "SELECT cs.class_session_id, ss.session_number, ss.start_time, ss2.end_time, cs.number_of_sessions, mb.mb_name " .
+                "FROM class_session cs " .
+                "JOIN session ss ON ss.session_id = cs.start_session_id " .
+                "JOIN merit_badge mb ON mb.mb_id = cs.merit_badge_id " .
+                "LEFT JOIN session ss2 ON ss2.session_number = (ss.session_number + cs.number_of_sessions - 1) " .
+                "ORDER BY cs.start_session_id ASC, mb.mb_name ASC";
+
+        $result = $conn->query($sql);
+        
+        $retArray = array();
+        
+        if($result->num_rows > 0)
+        {
+            while($row = $result->fetch_assoc()){
+                //$row[unit_id]
+                $retArray[] = array("session_id" => $row[class_session_id],
+                                    "session_number" => $row[session_number],
+                                    "start_time" => $row[start_time],
+                                    "end_time" => $row[end_time],
+                                    "number_of_sessions" => $row[number_of_sessions],
+                                    "mb_name" => $row[mb_name],
+                                    "scout_list" => array());
+            }
+        }
+        
+        foreach ($retArray as &$session) {
+            $sql =  "SELECT DISTINCT sc.scout_id, sc.first_name, sc.last_name, ut.unit_number " .
+                    "FROM schedule sh " .
+                    "JOIN scout sc ON sc.scout_id = sh.scout_id " .
+                    "JOIN unit ut ON ut.unit_id = sc.unit_id " .
+                    "JOIN week wk ON wk.week_id = ut.week_id " .
+                    "WHERE wk.week_number = " . $week . " AND sh.class_session_id = " . $session['session_id'] . " " .
+                    "ORDER BY sc.last_name ASC";
+
+            $result = $conn->query($sql);
+            
+            if($result->num_rows > 0)
+            {
+                while($row = $result->fetch_assoc()){
+                    $session['scout_list'][] = array(  "scout_id" => $row[scout_id],
+                                                    "first_name" => $row[first_name],
+                                                    "last_name" => $row[last_name],
+                                                    "unit_number" => $row[unit_number]);
+                }
+            }
+        }
+        unset($session);
+        
+        $conn->close();
+        
+        $this->data = $retArray;
+        echo json_encode($this->data);
+    }
     /*
      * Get the list of classes and scouts for the given week.
      * Build the schedule based on preferences and write to database.

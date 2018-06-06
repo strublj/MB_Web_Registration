@@ -102,9 +102,14 @@ li a:hover:not(.active) {
     width: unset;
 }
 
+#viewLbl {
+    margin-left: 10px;
+}
+
 #btn_generate_schedule, #btn_print_schedule {
     font-size: 15px;
     line-height: 2;
+    margin-left: 10px;
 }
 
 .scout-schedule {
@@ -168,8 +173,9 @@ li a:hover:not(.active) {
 
 @media print {
     
-.unit-schedule {
+.unit-schedule, .session-schedule {
     page-break-after: always;
+    font-size: 12px;
 }
 
 .dont-print {
