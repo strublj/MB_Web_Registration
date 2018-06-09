@@ -11,6 +11,7 @@
         <script src="../scripts/jquery.bootgrid.min.js"></script>
         <script src="../scripts/angular.min.js"></script>
         <script src="../scripts/angular-messages.min.js"></script>
+        <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     </head>
     <body ng-app="app" ng-controller="formCtrl" id="mycontroller">
         <div class="container">
@@ -37,7 +38,16 @@
                         <li><a href="./schedulemgmt">Schedule View/Generate</a></li>
                         <li id="Unit_Reg"><a href="../registration">Unit Registration</a></li>
                     </ul>
-                    <p>This area will contain charts and metrics about registration.</p>
+                    <table class="columns">
+                        <tr>
+                          <td><div id="unit_piechart" style="margin-right: 100px"></div></td>
+                          <td><div id="scout_piechart"></div></td>
+                        </tr>
+                    </table>
+                    <div id="dashboard_div" style="margin-top: 20px">
+                        <div id="filter_div"></div>
+                        <div id="pref_combochart"></div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -49,6 +59,168 @@
             });
             
             $(document).ready(function () {
+
+                google.charts.load('current', {'packages':['corechart', 'controls']});
+                google.charts.setOnLoadCallback(drawUnitPieChart);
+                google.charts.setOnLoadCallback(drawScoutPieChart);
+                google.charts.setOnLoadCallback(drawPrefComboChartDashboard);
+
+                /*
+                 * Use the Google Charts libraries to create a Pie Chart
+                 * showing the percentage of units distributed through
+                 * the weeks.
+                 */
+                function drawUnitPieChart() {
+
+                    var jsonData = $.ajax({
+                        url: "adminsvc.php",
+                        data: {'action': 'unitCountByWeek'},
+                        dataType: 'json'
+                      }).done(function (results) {
+                      
+                        var data = new google.visualization.DataTable();
+
+                        data.addColumn('string', 'Week');
+                        data.addColumn('number',   'Units');
+
+                        results.forEach(function(dataRow) {
+                          data.addRow([
+                              dataRow.week,
+                              parseFloat(dataRow.unit_count)
+                            ]);
+                        });
+
+                          var options = {
+                            title: 'Units by Week',
+                            pieSliceText: 'value',
+                            fontSize: 14,
+                            width: 350,
+                            height: 400,
+                            chartArea: {width: '100%', height: '80%'},
+                            legend: {position: 'bottom'}
+                          };
+
+                          var chart = new google.visualization.PieChart(document.getElementById('unit_piechart'));
+
+                          chart.draw(data, options);
+                      
+                      });
+                }
+                
+                /*
+                 * Use the Google Charts libraries to create a Pie Chart
+                 * showing the percentage of Scouts distributed through
+                 * the weeks.
+                 */
+                function drawScoutPieChart() {
+
+                    var jsonData = $.ajax({
+                        url: "adminsvc.php",
+                        data: {'action': 'scoutCountByWeek'},
+                        dataType: 'json'
+                      }).done(function (results) {
+                      
+                        var data = new google.visualization.DataTable();
+
+                        data.addColumn('string', 'Week');
+                        data.addColumn('number',   'Scouts');
+
+                        results.forEach(function(dataRow) {
+                          data.addRow([
+                              dataRow.week,
+                              parseFloat(dataRow.scout_count)
+                            ]);
+                        });
+
+                          var options = {
+                            title: 'Scouts by Week',
+                            pieSliceText: 'value',
+                            fontSize: 14,
+                            width: 350,
+                            height: 400,
+                            chartArea: {width: '100%', height: '80%'},
+                            legend: {position: 'bottom'}
+                          };
+
+                          var chart = new google.visualization.PieChart(document.getElementById('scout_piechart'));
+
+                          chart.draw(data, options);
+                      
+                      });
+                }
+
+                /*
+                 * Use the Google Charts libraries to create a Combo Chart
+                 * showing the number of Scouts requesting classes as their 
+                 * top 4 preferences by week, with a line displaying the max
+                 * class sizes.
+                 */
+                function drawPrefComboChartDashboard() {
+                    
+                    var jsonData = $.ajax({
+                        url: "adminsvc.php",
+                        data: {'action': 'preferenceCountByWeek'},
+                        dataType: 'json'
+                      }).done(function (results) {
+                      
+                        var data = new google.visualization.DataTable();
+
+                        data.addColumn('string', 'Class');
+                        data.addColumn('number',   'Week 1');
+                        data.addColumn('number',   'Week 2');
+                        data.addColumn('number',   'Week 3');
+                        data.addColumn('number',   'Week 4');
+                        data.addColumn('number',   'Week 5');
+                        data.addColumn('number',   'Week 6');
+                        data.addColumn('number',   'Week 7');
+                        data.addColumn('number',   'Size Limit');
+
+                        results.forEach(function(dataRow) {
+                          data.addRow([
+                              dataRow.class_name,
+                              parseFloat(dataRow.scout_count_1),
+                              parseFloat(dataRow.scout_count_2),
+                              parseFloat(dataRow.scout_count_3),
+                              parseFloat(dataRow.scout_count_4),
+                              parseFloat(dataRow.scout_count_5),
+                              parseFloat(dataRow.scout_count_6),
+                              parseFloat(dataRow.scout_count_7),
+                              parseFloat(dataRow.size_limit)
+                            ]);
+                        });
+
+                         var dashboard = new google.visualization.Dashboard(document.getElementById('dashboard_div'));
+                    
+                        var donutRangeSlider = new google.visualization.ControlWrapper({
+                            'controlType': 'CategoryFilter',
+                            'containerId': 'filter_div',
+                            'options': {
+                              'filterColumnLabel': 'Class',
+                              ui: {label: 'Filter by Class'}
+                            }
+                          });
+
+                        var comboChart = new google.visualization.ChartWrapper({
+                            'chartType': 'ComboChart',
+                            'containerId': 'pref_combochart',
+                            'options': {
+                                title : 'Total of Top 4 Preferences',
+                                vAxis: {title: 'Scouts'},
+                                hAxis: {title: 'Class'},
+                                seriesType: 'bars',
+                                width: 1000,
+                                height: 800,
+                                chartArea: {width: '90%', height: '80%'},
+                                legend: {position: 'top'},
+                                series: {7: {type: 'line'}}
+                            }
+                          });
+
+                          dashboard.bind(donutRangeSlider, comboChart);
+                          dashboard.draw(data);
+                      
+                      }); 
+                }
 
                 //Validate admin rights
                 $.ajax({
