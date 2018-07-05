@@ -34,8 +34,8 @@
                     </div>
                     <ul class="dont-print">
                         <li><a href="../">Home</a></li>
-                        <li><a class="active" href="./">Schedule View/Generate</a></li>
-                        <li><a href="../viewpreferences">Preferences View</a></li>
+                        <li><a href="../schedulemgmt">Schedule View/Generate</a></li>
+                        <li><a class="active" href="./">Preferences View</a></li>
                         <li><a href="../sessionmgmt">Class/Session Management</a></li>
                         <li><a href="../emailaccounts">Email Account Information</a></li>
                         <li id="Unit_Reg" style="display: none;"><a href="../../registration">Unit Registration</a></li>
@@ -44,38 +44,33 @@
                         <label class="control-label">Select Week:</label>
                         <select class="form-control inline-form" id="weekSel" name="weekSel" ng-model="weekSelected" ng-options="Week.week_text for Week in Weeks track by Week.week_id" ng-change="weekChanged()">
                         </select>                        
-                        <label id="viewLbl" class="control-label">Select View:</label>
-                        <select class="form-control inline-form" id="viewSel" name="viewSel" ng-model="viewSelected" ng-options="View.view_text for View in Views track by View.view_id" ng-change="viewChanged()">
-                        </select>
-                        <button type="button" class="btn btn-xs btn-primary" id="btn_generate_schedule" data-row-id="0" ng-click="generateSchedule()">
-                                <span class="glyphicon glyphicon-asterisk"></span>Generate / Regenerate Schedule</button>
-                        <button type="button" class="btn btn-xs btn-primary" id="btn_print_schedule" data-row-id="0" ng-click="print()">
-                                <span class="glyphicon glyphicon-print"></span>  Print Schedule</button>
+                        <button type="button" class="btn btn-xs btn-primary" id="btn_print_preferences" data-row-id="0" ng-click="print()">
+                                <span class="glyphicon glyphicon-print"></span>  Print Preferences</button>
                     </div>
                     <div class="unit-schedule" ng-show="unitView" ng-repeat="u in Units">
                         <h2>{{u.unit_type}} {{u.unit_number}} - {{u.council_name}}</h2>
                         <table class="scout-schedule">
                             <tr>
                                 <th>Scout</th>
-                                <th>{{u.start1}} - {{u.end1}}</th>
-                                <th>{{u.start2}} - {{u.end2}}</th>
-                                <th>{{u.start3}} - {{u.end3}}</th>
-                                <th>{{u.start4}} - {{u.end4}}</th>
+                                <th>Age</th>
+                                <th>1st</th>
+                                <th>2nd</th>
+                                <th>3rd</th>
+                                <th>4th</th>
+                                <th>5th</th>
+                                <th>6th</th>
                             </tr>
                             <tr ng-repeat="s in u.scout_list">
                               <td>{{s.first_name}} {{s.last_name}}</td>
+                              <td>{{s.age}}</td>
                               <td>{{s.class_list[1].mb_name}}</td>
                               <td>{{s.class_list[2].mb_name}}</td>
                               <td>{{s.class_list[3].mb_name}}</td>
                               <td>{{s.class_list[4].mb_name}}</td>
+                              <td>{{s.class_list[5].mb_name}}</td>
+                              <td>{{s.class_list[6].mb_name}}</td>
                             </tr>
                         </table>
-                    </div>
-                    <div class="session-schedule" ng-show="!unitView" ng-repeat="cs in Sessions">
-                        <h2>{{cs.mb_name}}  {{cs.start_time}} - {{cs.end_time}}</h2>
-                        <div ng-repeat="s in cs.scout_list">
-                            <h4>{{s.first_name}} {{s.last_name}} - {{s.unit_number}}</h4>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -90,56 +85,20 @@
                 /*
                  * Calls the Schedule service to get the data for the Weeks select box
                  */
-                $http.get("schedulesvc.php?action=getWeeks")
+                $http.get("../schedulemgmt/schedulesvc.php?action=getWeeks")
                     .then(function(response) {
                         $scope.Weeks = response.data;
                         $scope.weekSelected = $scope.Weeks[0];
                         $scope.weekChanged();
                     });
                 
-                // The array of options in the Views select box.
-                $scope.Views = [{view_id: 1,
-                                view_text: 'By Unit'}, 
-                                {view_id: 2,
-                                view_text: 'By Class Session'}];
-                $scope.viewSelected = $scope.Views[0];
-                
                 /*
                  * Call the Schedule service to get the JSON for the current schedule.
                  */
                 $scope.weekChanged = function() {
-                    $http.get("schedulesvc.php?action=getScheduleByUnit&week=" + $scope.weekSelected.week_id)
+                    $http.get("prefviewsvc.php?action=getPreferencesByUnit&week=" + $scope.weekSelected.week_id)
                      .then(function(response) {
                         $scope.Units = response.data;
-                    });
-                    $http.get("schedulesvc.php?action=getScheduleBySession&week=" + $scope.weekSelected.week_id)
-                     .then(function(response) {
-                        $scope.Sessions = response.data;
-                    });
-                };
-                
-                /*
-                 * Set the flag to change how the schedule is displayed; by unit or by session
-                 */
-                $scope.viewChanged = function() {
-                    if($scope.viewSelected.view_id == 1)
-                    {
-                        $scope.unitView = true;
-                    }
-                    else
-                    {
-                        $scope.unitView = false;
-                    }
-                };
-                
-                /*
-                 * Call the Schedule service to build a new schedule based on
-                 * current preferences and refresh the display.
-                 */
-                $scope.generateSchedule = function() {
-                  $http.get("schedulesvc.php?action=buildSchedule&week=" + $scope.weekSelected.week_id)
-                    .then(function(response) {
-                        $scope.weekChanged();
                     });
                 };
                 
@@ -158,7 +117,7 @@
                 //Validate admin rights
                 $.ajax({
                     type: "POST",
-                    url: "schedulesvc.php",
+                    url: "prefviewsvc.php",
                     data: {'action': 'checkAdmin'},
                     dataType: "json",
                     success: function (response)

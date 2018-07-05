@@ -124,7 +124,7 @@ class Admin {
         $conn = new mysqli($servername, $username, $password, $dbname);
         $sql =  "SELECT wk.week_number 'Week', count(sc.scout_id) 'Scout_Count' " .
                 "FROM week wk " .
-                "LEFT JOIN unit ut ON ut.unit_id = wk.week_id " .
+                "LEFT JOIN unit ut ON ut.week_id = wk.week_id " .
                 "LEFT JOIN scout sc ON sc.unit_id = ut.unit_id " .
                 "GROUP BY wk.week_number " .
                 "ORDER BY wk.week_number";

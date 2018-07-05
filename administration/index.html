@@ -36,7 +36,10 @@
                     <ul>
                         <li><a class="active" href="./">Home</a></li>
                         <li><a href="./schedulemgmt">Schedule View/Generate</a></li>
-                        <li id="Unit_Reg"><a href="../registration">Unit Registration</a></li>
+                        <li><a href="./viewpreferences">Preferences View</a></li>
+                        <li><a href="./sessionmgmt">Class/Session Management</a></li>
+                        <li><a href="./emailaccounts">Email Account Information</a></li>
+                        <li id="Unit_Reg" style="display: none;"><a href="../registration">Unit Registration</a></li>
                     </ul>
                     <table class="columns">
                         <tr>
@@ -63,7 +66,7 @@
                 google.charts.load('current', {'packages':['corechart', 'controls']});
                 google.charts.setOnLoadCallback(drawUnitPieChart);
                 google.charts.setOnLoadCallback(drawScoutPieChart);
-                google.charts.setOnLoadCallback(drawPrefComboChartDashboard);
+               // google.charts.setOnLoadCallback(drawPrefComboChartDashboard);
 
                 /*
                  * Use the Google Charts libraries to create a Pie Chart
@@ -234,9 +237,9 @@
                         {
                             window.location = "../"
                         }
-                        if(response.hasUnit == 'false')
+                        if(response.hasUnit == 'true')
                         {
-                            $("#Unit_Reg").hide();
+                            $("#Unit_Reg").show();
                         }
                     }
                 });

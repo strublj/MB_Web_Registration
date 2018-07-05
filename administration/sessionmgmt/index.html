@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <title>Fire Mountain Merit Badge Registration</title>
+        <link rel="stylesheet" href="../../styles/bootstrap.min.css" type="text/css" media="all">
+        <link href="../../styles/jquery.bootgrid.min.css" rel="stylesheet" />
+        <link href="../../styles/styles.css" rel="stylesheet" />
+        <script src="../../scripts/jquery-3.2.1.min.js"></script>
+        <script src="../../scripts/bootstrap.min.js"></script>
+        <script src="../../scripts/jquery.bootgrid.min.js"></script>
+        <script src="../../scripts/angular.min.js"></script>
+        <script src="../../scripts/angular-messages.min.js"></script>
+    </head>
+    <body ng-app="app" ng-controller="formCtrl" id="mycontroller">
+        <div class="container">
+            <section id="intro" class="dont-print">
+                <header>
+                    <h2>Fire Mountain</h2>
+                    <h2>Merit Badge Registration</h2>
+                    <div id="logo_container" class="pull-right"><img src="http://firemtn.org/images/fm_logo_new_full_color_no_words.png" alt=""></div>
+                </header>
+            </section>  
+            <div class="">
+                <div class="col-sm-12">
+                    <div class="well clearfix dont-print">
+                        <div class="pull-left">
+                            <h2 id="admin_title">Merit Badge Registration Administration</h2>
+                        </div>
+                        <div class="pull-right" style="padding-top: 25px">
+                            <button type="button" class="btn btn-xs btn-primary" id="btn_logout" data-row-id="0">
+                                <span class="glyphicon glyphicon-asterisk"></span>Logout</button>
+                        </div>
+                    </div>
+                    <ul class="dont-print">
+                        <li><a href="../">Home</a></li>
+                        <li><a href="../schedulemgmt">Schedule View/Generate</a></li>
+                        <li><a href="../viewpreferences">Preferences View</a></li>
+                        <li><a class="active" href="./">Class/Session Management</a></li>
+                        <li><a href="../emailaccounts">Email Account Information</a></li>
+                        <li id="Unit_Reg" style="display: none;"><a href="../../registration">Unit Registration</a></li>
+                    </ul>
+                    <div class="inline-form-group dont-print">
+                        <label class="control-label">Select Class:</label>
+                        <select class="form-control inline-form" id="classSel" name="classSel" ng-model="classSelected" ng-options="Class.mb_name for Class in Classes track by Class.mb_id" ng-change="classChanged()">
+                            <option value="">Create New Class</option>
+                        </select>
+                    </div>
+                    <div>
+                        <h3>Class Details</h3>
+                        <form method="post" id="frm_mb_edit" name="frm_mb_edit" novalidate>
+                            <input type="hidden" name="mb_id" id="mb_id">
+                            <label class="control-label">Name: <input class="form-control" type="text" name="mb_name" ng-model="mb_name" required /></label>
+                            <label class="control-label">Area: <input class="form-control" type="text" name="area" ng-model="area" /></label>
+                            <label class="control-label">Location: <input class="form-control" type="text" name="location" ng-model="location" /></label>
+                            <br />
+                            <label class="control-label">Cost: <input class="form-control numbersOnly" type="text" name="cost" ng-model="cost" /></label>
+                            <label class="control-label">Min Age: <input class="form-control numbersOnly" type="text" name="min_age" ng-model="min_age" /></label>
+                            <label class="control-label">Difficulty: <input class="form-control" type="text" name="difficulty" ng-model="difficulty" /></label>
+                            <br />
+                            <label class="control-label">Pre Req:</label><input class="form-control" type="text" name="pre_req" ng-model="pre_req" />
+                            <label class="control-label">Min Rank: <select class="form-control" name="rank" ng-model="rank" ng-options="rank.rank_name for rank in Ranks track by rank.rank_id">
+                                    <option value="">Select rank</option>
+                                </select></label>
+                            <br />
+                            <label class="control-label">Eagle Req?: </label> 
+                                <label><input type="radio" name="eagle_req_yes" ng-model="eagle_req" value="1" />Yes</label> 
+                                <label><input type="radio" name="eagle_req_no" ng-model="eagle_req" value="0" />No</label>     
+                                <label class="control-label" style="padding-left: 15px">STEM?: </label> 
+                                <label><input type="radio" name="stem_no" ng-model="stem" value="1" />Yes</label> 
+                                <label><input type="radio" name="stem_no" ng-model="stem" value="0" />No</label>
+                            <br />
+                            <label class="control-label">Notes:</label><input class="form-control" type="text" name="mb_notes" ng-model="mb_notes" />
+                            <br />
+                            <button type="button" class="btn btn-primary" ng-click="addClass()">
+                                <span class="glyphicon glyphicon-plus"></span> Add Class</button>
+                            <button type="button" class="btn btn-primary" style="margin-right: 20px" ng-click="deleteModal()">
+                                <span class="glyphicon glyphicon-remove"></span> Delete Class</button>
+                            <input type="button" class="btn btn-primary" ng-click="classChanged()" value="Reset" />
+                            <input type="button" id="btn_edit" class="btn btn-primary" ng-click="update(mb_id, mb_name, area, location, cost, min_age, difficulty, pre_req, rank.rank_id, eagle_req, stem, mb_notes)" value="Save" />
+                        </form>
+                    </div>
+                    <div>
+                        <h3>Sessions</h3>
+                        <table class="scout-schedule">
+                            <tr>
+                                <th>Start Session</th>
+                                <th>Number of Sessions</th>
+                                <th>Size Limit</th>
+                                <th></th>
+                            </tr>
+                            <tr ng-repeat="s in Sessions">
+                              <td>{{s.start_session}}</td>
+                              <td>{{s.number_sessions}}</td>
+                              <td>{{s.size_limit}}</td>
+                              <td><a class="btn btn-xs delete-record" style="padding-right: 20px" ng-click="deleteSessionModal(s.class_session_id, s.start_session)"><i class="glyphicon glyphicon-trash"></i></a>
+                                  <a class="btn btn-xs edit-record" ng-click="editSession(s.class_session_id)"><i class="glyphicon glyphicon-edit"></i></a></td>
+                            </tr>
+                        </table>
+                        <div class="pull-left" style="padding-top: 25px">
+                            <button type="button" id="add_session_btn" class="btn btn-primary" style="margin-bottom: 20px" ng-click="addSession()">
+                                <span class="glyphicon glyphicon-plus"></span> Add Session</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="edit_model" class="modal fade">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                        <h4 id="session_form_title" class="modal-title">Edit Session</h4>
+                    </div>
+                    <form method="post" id="frm_edit" name="frm_edit" novalidate>
+                        <div class="modal-body">
+                            <input type="hidden" value="0" name="edit_class_session_id" id="edit_class_session_id">
+                            <div class="form-group">
+                                <label for="start" class="control-label">Start Session:</label>
+                                <select class="form-control" id="edit_start_session" name="edit_start_session" ng-model="start_session" ng-options="session.session_name for session in SessionNumbers track by session.session_id">
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="number" class="control-label">Number of Sessions:</label>
+                                <select class="form-control" id="edit_number_sessions" name="edit_number_sessions" ng-model="number_sessions" ng-options="session.session_name for session in SessionNumbers track by session.session_id">
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="limit" class="control-label">Size Limit:</label>
+                                <input type="text" class="form-control numbersOnly" id="edit_size_limit" name="edit_size_limit" ng-model="edit_size_limit" required/>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                            <button type="button" id="btn_edit" class="btn btn-primary" ng-click="addUpdateSession(edit_class_session_id, start_session.session_id, number_sessions.session_id, edit_size_limit)">Save</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div id="delete_model" class="modal fade">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                        <h4 class="modal-title">Delete Class</h4>
+                    </div>
+                    <form method="post" id="frm_delete" name="frm_delete" novalidate>
+                        <div class="modal-body">
+                            <p id="delete_msg">Place holder delete message?</p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                            <button type="button" id="btn_delete" class="btn btn-primary" ng-click="deleteClass()">Delete</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div id="delete_session_model" class="modal fade">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                        <h4 class="modal-title">Delete Session</h4>
+                    </div>
+                    <form method="post" id="frm_session_delete" name="frm_session_delete" novalidate>
+                        <input type="hidden" name="delete_session_id" id="delete_session_id">
+                        <div class="modal-body">
+                            <p id="delete_session_msg">Place holder delete message?</p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                            <button type="button" id="btn_session_delete" class="btn btn-primary" ng-click="deleteSession()">Delete</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <script type="text/javascript">
+            var app = angular.module('app', ['ngMessages']);
+            app.controller('formCtrl', function($scope, $http) {
+                /*
+                 * Calls the Schedule service to get the data for the Weeks select box
+                 */
+                $http.get("sessionmgmtsvc.php?action=getClasses")
+                    .then(function(response) {
+                        $scope.Classes = response.data;
+                        $scope.classSelected = $scope.Classes[0];
+                        $scope.classChanged();
+                    });
+                
+                /*
+                 * Call the Schedule service to get the JSON for the current schedule.
+                 */
+                $scope.classChanged = function() {
+                    if(angular.isUndefined($scope.classSelected) || $scope.classSelected === null)
+                    {
+                        $scope.mb_id = 0;
+                        $scope.mb_name = "";
+                        $scope.eagle_req = 0;
+                        $scope.stem = 0;
+                        $scope.pre_req = "";
+                        $scope.area = "";
+                        $scope.location = "";
+                        $scope.cost = "";
+                        $scope.difficulty = "";
+                        $scope.min_age = null;
+                        $scope.rank = null;
+                        $scope.mb_notes = "";
+                        
+                        $scope.Sessions = null;
+                        
+                        $('#add_session_btn').prop('disabled', true);
+                    }
+                    else
+                    {
+                        $http.get("sessionmgmtsvc.php?action=getClass&classId=" + $scope.classSelected.mb_id)
+                        .then(function(response) {
+                           $scope.mb_id = response.data.mb_id;
+                           $scope.mb_name = response.data.mb_name;
+                           $scope.eagle_req = response.data.eagle_req;
+                           $scope.stem = response.data.stem;
+                           $scope.pre_req = response.data.pre_req;
+                           $scope.area = response.data.area;
+                           $scope.location = response.data.location;
+                           $scope.cost = response.data.cost;
+                           $scope.difficulty = response.data.difficulty;
+                           $scope.min_age = response.data.min_age;
+                           $scope.rank = {rank_id: response.data.min_rank_id, rank_name: response.data.min_rank_name};
+                           $scope.mb_notes = response.data.mb_notes;
+                           
+                           $('#add_session_btn').prop('disabled', false);
+                       });
+                       
+                       $http.get("sessionmgmtsvc.php?action=getSessions&classId=" + $scope.classSelected.mb_id)
+                        .then(function(response) {
+                           $scope.Sessions = response.data;
+                       });
+                    }
+                    
+                    
+                };
+                
+                $scope.addClass = function() {
+                    $scope.classSelected = null;
+                    $scope.classChanged();
+                };
+                
+                $scope.deleteModal = function() {
+                    var msg = "Are you sure you want to delete the class '" + $scope.mb_name + "'?";
+                    $('#delete_msg').html(msg);
+                    $('#delete_model').modal('show');
+                };
+                
+                $scope.deleteClass = function() {
+                    var data = {
+                      action: 'deleteClass',
+                      mb_id: $scope.mb_id
+                    };  
+
+                    $.ajax({
+                         type: "POST",
+                         url: "sessionmgmtsvc.php",
+                         data: data,
+                         dataType: "json",
+                         success: function (response)
+                         {
+                             window.location = "./";
+                         }
+                     });
+                };
+                
+                $scope.update = function(mb_id, mb_name, area, location, cost, min_age, difficulty, pre_req, rank_id, eagle_req, stem, mb_notes) {
+                  var data = {
+                      action: 'addUpdateClass',
+                      mb_id: mb_id,
+                      mb_name: mb_name,
+                      area: area,
+                      location: location,
+                      cost: cost,
+                      min_age: min_age,
+                      difficulty: difficulty,
+                      pre_req: pre_req,
+                      min_rank_id: rank_id,
+                      eagle_req: eagle_req,
+                      stem: stem,
+                      mb_notes: mb_notes
+                  };  
+
+                    $.ajax({
+                         type: "POST",
+                         url: "sessionmgmtsvc.php",
+                         data: data,
+                         dataType: "json",
+                         success: function (response)
+                         {
+                             window.location = "./";
+                         }
+                     });
+                };
+                
+                $scope.addUpdateSession = function(class_session_id, start_session_id, number_sessions, size_limit) {
+                    var data = {
+                      action: 'addUpdateSession',
+                      mb_id: $scope.mb_id,
+                      class_session_id: class_session_id,
+                      start_session_id: start_session_id,
+                      number_sessions: number_sessions,
+                      size_limit: size_limit
+                  };  
+
+                    $.ajax({
+                         type: "POST",
+                         url: "sessionmgmtsvc.php",
+                         data: data,
+                         dataType: "json",
+                         success: function (response)
+                         {
+                             $scope.classChanged();
+                             $('#edit_model').modal('hide');
+                         }
+                     });
+                };
+                
+                $scope.deleteSessionModal = function(sessionId, start_session) {
+                    var msg = "Are you sure you want to delete the session starting at " + start_session + " for class '" + $scope.mb_name + "'?";
+                    $('#delete_session_msg').html(msg);
+                    $('#delete_session_id').val(sessionId);
+                    $('#delete_session_model').modal('show');
+                };
+                
+                $scope.deleteSession = function() {
+                    var data = {
+                      action: 'deleteSession',
+                      session_id: $('#delete_session_id').val()
+                    };  
+
+                    $.ajax({
+                         type: "POST",
+                         url: "sessionmgmtsvc.php",
+                         data: data,
+                         dataType: "json",
+                         success: function (response)
+                         {
+                             $('#delete_session_model').modal('hide');
+                            $scope.classChanged();
+                         }
+                     });
+                };
+                
+                $scope.addSession = function() {
+                    var title = 'Add Session for ' + $scope.mb_name;
+                    $('#session_form_title').html(title);
+                    $scope.edit_class_session_id = 0;
+                    $scope.start_session = {session_id: 1, session_name: 1};
+                    $scope.number_sessions = {session_id: 1, session_name: 1};
+                    $scope.edit_size_limit = 25;
+                    $('#edit_model').modal('show');
+                };
+                
+                $scope.editSession = function(sessionId) {
+                    $http.get("sessionmgmtsvc.php?action=getSessionDetails&sessionId=" + sessionId)
+                        .then(function(response) {
+                            var title = 'Edit Session for ' + $scope.mb_name;
+                            $('#session_form_title').html(title);
+                            $scope.edit_class_session_id = response.data.class_session_id;
+                            $scope.start_session = {session_id: response.data.start_session_id, session_name: response.data.start_session_name};
+                            $scope.number_sessions = {session_id: response.data.number_session_id, session_name: response.data.number_session_name};
+                            $scope.edit_size_limit = response.data.size_limit;
+                            $('#edit_model').modal('show');
+                       });
+                };
+                
+                /*
+                 * Sets the Ranks object to the list of ranks returned from the service.
+                 */
+                $http.get("../../registration/registrationsvc.php?action=rankList")
+                    .then(function(response) {
+                        $scope.Ranks = response.data;
+                    });
+               
+                /*
+                 * Sets the class session options
+                 */
+                $http.get("sessionmgmtsvc.php?action=sessionList")
+                    .then(function(response) {
+                        $scope.SessionNumbers = response.data;
+                    });
+            });
+            
+            $(document).ready(function () {
+
+                //Validate admin rights
+                $.ajax({
+                    type: "POST",
+                    url: "sessionmgmtsvc.php",
+                    data: {'action': 'checkAdmin'},
+                    dataType: "json",
+                    success: function (response)
+                    {
+                        if(response.success != 'true')
+                        {
+                            window.location = "../../";
+                        }
+                        if(response.hasUnit == 'true')
+                        {
+                            $("#Unit_Reg").show();
+                        }
+                    }
+                });
+            });
+            
+            // Logout button click
+            $('#btn_logout').click(function() {
+                $.ajax({
+                    type: "POST",
+                    url: "../../registration/registrationsvc.php",
+                    data: {'action': 'logout'},
+                    dataType: "json",
+                    success: function (response)
+                    {
+                        if(response.success == 'true')
+                        {
+                            window.location = "../../";
+                        }
+                    }
+                });
+            });
+            
+            // Ensure certain fields only allow whole numbers
+            $('.numbersOnly').keyup(function () { 
+                this.value = this.value.replace(/[^0-9]/g,'');
+            });
+            
+            
+        </script>
+    </body>
+</html>
