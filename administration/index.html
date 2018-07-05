@@ -29,7 +29,7 @@
                             <h2 id="admin_title">Merit Badge Registration Administration</h2>
                         </div>
                         <div class="pull-right" style="padding-top: 25px">
-                            <button type="button" class="btn btn-xs btn-primary" id="btn_logout" data-row-id="0">
+                            <button type="button" class="btn btn-primary" id="btn_logout" data-row-id="0">
                                 <span class="glyphicon glyphicon-asterisk"></span>Logout</button>
                         </div>
                     </div>
@@ -66,7 +66,7 @@
                 google.charts.load('current', {'packages':['corechart', 'controls']});
                 google.charts.setOnLoadCallback(drawUnitPieChart);
                 google.charts.setOnLoadCallback(drawScoutPieChart);
-               // google.charts.setOnLoadCallback(drawPrefComboChartDashboard);
+                google.charts.setOnLoadCallback(drawPrefComboChartDashboard);
 
                 /*
                  * Use the Google Charts libraries to create a Pie Chart

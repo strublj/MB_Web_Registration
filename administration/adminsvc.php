@@ -54,57 +54,144 @@ class Admin {
     function preferenceCountByWeek($servername, $username, $password, $dbname) {        
         
         $conn = new mysqli($servername, $username, $password, $dbname);
-        $sql =  "SELECT mb.mb_id, mb.mb_name, count(sc1.scout_id) 'Scout_Count_1', count(sc2.scout_id) 'Scout_Count_2', " . 
-                "count(sc3.scout_id) 'Scout_Count_3', count(sc4.scout_id) 'Scout_Count_4', count(sc5.scout_id) 'Scout_Count_5', " . 
-                "count(sc6.scout_id) 'Scout_Count_6', count(sc7.scout_id) 'Scout_Count_7' " .
-                "FROM merit_badge mb " .
-                "LEFT JOIN scout sc1 ON (sc1.pref1_mb_id = mb.mb_id OR sc1.pref2_mb_id = mb.mb_id OR sc1.pref3_mb_id = mb.mb_id OR sc1.pref4_mb_id = mb.mb_id) " .
-                    "AND (sc1.scout_id IN (SELECT sc11.scout_id FROM scout sc11 JOIN unit ut11 ON ut11.unit_id = sc11.unit_id JOIN week wk11 ON wk11.week_id = ut11.week_id WHERE wk11.week_number = 1)) " .
-                "LEFT JOIN scout sc2 ON (sc2.pref1_mb_id = mb.mb_id OR sc2.pref2_mb_id = mb.mb_id OR sc2.pref3_mb_id = mb.mb_id OR sc2.pref4_mb_id = mb.mb_id) " . 
-                    "AND (sc2.scout_id IN (SELECT sc22.scout_id FROM scout sc22 JOIN unit ut22 ON ut22.unit_id = sc22.unit_id JOIN week wk22 ON wk22.week_id = ut22.week_id WHERE wk22.week_number = 2)) " .
-                "LEFT JOIN scout sc3 ON (sc3.pref1_mb_id = mb.mb_id OR sc3.pref2_mb_id = mb.mb_id OR sc3.pref3_mb_id = mb.mb_id OR sc3.pref4_mb_id = mb.mb_id) " . 
-                    "AND (sc3.scout_id IN (SELECT sc33.scout_id FROM scout sc33 JOIN unit ut33 ON ut33.unit_id = sc33.unit_id JOIN week wk33 ON wk33.week_id = ut33.week_id WHERE wk33.week_number = 3)) " .
-                "LEFT JOIN scout sc4 ON (sc4.pref1_mb_id = mb.mb_id OR sc4.pref2_mb_id = mb.mb_id OR sc4.pref3_mb_id = mb.mb_id OR sc4.pref4_mb_id = mb.mb_id) " . 
-                    "AND (sc4.scout_id IN (SELECT sc44.scout_id FROM scout sc44 JOIN unit ut44 ON ut44.unit_id = sc44.unit_id JOIN week wk44 ON wk44.week_id = ut44.week_id WHERE wk44.week_number = 4)) " .
-                "LEFT JOIN scout sc5 ON (sc5.pref1_mb_id = mb.mb_id OR sc5.pref2_mb_id = mb.mb_id OR sc5.pref3_mb_id = mb.mb_id OR sc5.pref4_mb_id = mb.mb_id) " .
-                    "AND (sc5.scout_id IN (SELECT sc55.scout_id FROM scout sc55 JOIN unit ut55 ON ut55.unit_id = sc55.unit_id JOIN week wk55 ON wk55.week_id = ut55.week_id WHERE wk55.week_number = 5)) " .
-                "LEFT JOIN scout sc6 ON (sc6.pref1_mb_id = mb.mb_id OR sc6.pref2_mb_id = mb.mb_id OR sc6.pref3_mb_id = mb.mb_id OR sc6.pref4_mb_id = mb.mb_id) " .
-                    "AND (sc6.scout_id IN (SELECT sc66.scout_id FROM scout sc66 JOIN unit ut66 ON ut66.unit_id = sc66.unit_id JOIN week wk66 ON wk66.week_id = ut66.week_id WHERE wk66.week_number = 6)) " .
-                "LEFT JOIN scout sc7 ON (sc7.pref1_mb_id = mb.mb_id OR sc7.pref2_mb_id = mb.mb_id OR sc7.pref3_mb_id = mb.mb_id OR sc7.pref4_mb_id = mb.mb_id) " .
-                    "AND (sc7.scout_id IN (SELECT sc77.scout_id FROM scout sc77 JOIN unit ut77 ON ut77.unit_id = sc77.unit_id JOIN week wk77 ON wk77.week_id = ut77.week_id WHERE wk77.week_number = 7)) " .
-                "GROUP BY mb.mb_id, mb.mb_name " .
-                "HAVING count(sc1.scout_id) > 0 OR count(sc2.scout_id) > 0 OR count(sc3.scout_id) > 0 OR count(sc4.scout_id) > 0 OR count(sc5.scout_id) > 0 OR count(sc6.scout_id) > 0 OR count(sc7.scout_id) > 0 " .
-                "ORDER BY mb.mb_name";
-        $result = $conn->query($sql);
+        $sql_classes =  "SELECT mb.mb_id, mb.mb_name " . 
+                        "FROM merit_badge mb " .
+                        "ORDER BY mb.mb_name";
+        $result_classes = $conn->query($sql_classes);
         
         $ret = array();
         
-        if ($result->num_rows > 0) {
-            while($row = $result->fetch_assoc()){
-                    $sql2 = "SELECT mb.mb_id, mb.mb_name, sum(cs.size_limit) 'Size_Limit' " .
+        if ($result_classes->num_rows > 0) {
+            while($row_class = $result_classes->fetch_assoc()){
+                    $sql_size = "SELECT mb.mb_id, mb.mb_name, sum(cs.size_limit) 'Size_Limit' " .
                             "FROM merit_badge mb " .
                             "JOIN class_session cs ON cs.merit_badge_id = mb.mb_id " .
-                            "WHERE mb.mb_id = " . $row[mb_id] . " " .
+                            "WHERE mb.mb_id = " . $row_class[mb_id] . " " .
                             "GROUP BY mb.mb_id, mb.mb_name " .
                             "ORDER BY mb.mb_name";
-                    $result2 = $conn->query($sql2);
+                    $result_size = $conn->query($sql_size);
                     
                     $class_max = 0;
                     
-                    if ($result2->num_rows > 0) {
-                        $row2 = $result2->fetch_assoc();
+                    if ($result_size->num_rows > 0) {
+                        $row_size = $result_size->fetch_assoc();
                         
-                        $class_max = $row2[Size_Limit];
-                    }                    
+                        $class_max = $row_size[Size_Limit];
+                    }
+                    
+                    $sql_week1 =    "SELECT mb.mb_id, mb.mb_name, count(mb.mb_id) 'sum' " .
+                                    "FROM merit_badge mb " .
+                                    "LEFT JOIN scout sc1 ON ((sc1.pref1_mb_id = mb.mb_id OR sc1.pref2_mb_id = mb.mb_id OR sc1.pref3_mb_id = mb.mb_id OR sc1.pref4_mb_id = mb.mb_id) AND sc1.unit_id IN " .
+                                        "(SELECT unit_id FROM unit WHERE week_id = 1)) " .
+                                    "WHERE mb.mb_id = " . $row_class[mb_id] . " ";
+                    $result_week1 = $conn->query($sql_week1);
+                    
+                    $week1_pref = 0;
+                    
+                    if ($result_week1->num_rows > 0) {
+                        $row_week1 = $result_week1->fetch_assoc();
+                        
+                        $week1_pref = $row_week1[sum];
+                    }
+                    
+                    $sql_week2 =    "SELECT mb.mb_id, mb.mb_name, count(mb.mb_id) 'sum' " .
+                                    "FROM merit_badge mb " .
+                                    "LEFT JOIN scout sc1 ON ((sc1.pref1_mb_id = mb.mb_id OR sc1.pref2_mb_id = mb.mb_id OR sc1.pref3_mb_id = mb.mb_id OR sc1.pref4_mb_id = mb.mb_id) AND sc1.unit_id IN " .
+                                        "(SELECT unit_id FROM unit WHERE week_id = 2)) " .
+                                    "WHERE mb.mb_id = " . $row_class[mb_id] . " ";
+                    $result_week2 = $conn->query($sql_week2);
+                    
+                    $week2_pref = 0;
+                    
+                    if ($result_week2->num_rows > 0) {
+                        $row_week2 = $result_week2->fetch_assoc();
+                        
+                        $week2_pref = $row_week2[sum];
+                    }
                 
-                    $ret[] = array( "class_name" => $row[mb_name],
-                                    "scout_count_1" => $row[Scout_Count_1],
-                                    "scout_count_2" => $row[Scout_Count_2],
-                                    "scout_count_3" => $row[Scout_Count_3],
-                                    "scout_count_4" => $row[Scout_Count_4],
-                                    "scout_count_5" => $row[Scout_Count_5],
-                                    "scout_count_6" => $row[Scout_Count_6],
-                                    "scout_count_7" => $row[Scout_Count_7],
+                    $sql_week3 =    "SELECT mb.mb_id, mb.mb_name, count(mb.mb_id) 'sum' " .
+                                    "FROM merit_badge mb " .
+                                    "LEFT JOIN scout sc1 ON ((sc1.pref1_mb_id = mb.mb_id OR sc1.pref2_mb_id = mb.mb_id OR sc1.pref3_mb_id = mb.mb_id OR sc1.pref4_mb_id = mb.mb_id) AND sc1.unit_id IN " .
+                                        "(SELECT unit_id FROM unit WHERE week_id = 3)) " .
+                                    "WHERE mb.mb_id = " . $row_class[mb_id] . " ";
+                    $result_week3 = $conn->query($sql_week3);
+                    
+                    $week3_pref = 0;
+                    
+                    if ($result_week3->num_rows > 0) {
+                        $row_week3 = $result_week3->fetch_assoc();
+                        
+                        $week3_pref = $row_week3[sum];
+                    }
+                    
+                    $sql_week4 =    "SELECT mb.mb_id, mb.mb_name, count(mb.mb_id) 'sum' " .
+                                    "FROM merit_badge mb " .
+                                    "LEFT JOIN scout sc1 ON ((sc1.pref1_mb_id = mb.mb_id OR sc1.pref2_mb_id = mb.mb_id OR sc1.pref3_mb_id = mb.mb_id OR sc1.pref4_mb_id = mb.mb_id) AND sc1.unit_id IN " .
+                                        "(SELECT unit_id FROM unit WHERE week_id = 4)) " .
+                                    "WHERE mb.mb_id = " . $row_class[mb_id] . " ";
+                    $result_week4 = $conn->query($sql_week4);
+                    
+                    $week4_pref = 0;
+                    
+                    if ($result_week4->num_rows > 0) {
+                        $row_week4 = $result_week4->fetch_assoc();
+                        
+                        $week4_pref = $row_week4[sum];
+                    }
+                    
+                    $sql_week5 =    "SELECT mb.mb_id, mb.mb_name, count(mb.mb_id) 'sum' " .
+                                    "FROM merit_badge mb " .
+                                    "LEFT JOIN scout sc1 ON ((sc1.pref1_mb_id = mb.mb_id OR sc1.pref2_mb_id = mb.mb_id OR sc1.pref3_mb_id = mb.mb_id OR sc1.pref4_mb_id = mb.mb_id) AND sc1.unit_id IN " .
+                                        "(SELECT unit_id FROM unit WHERE week_id = 5)) " .
+                                    "WHERE mb.mb_id = " . $row_class[mb_id] . " ";
+                    $result_week5 = $conn->query($sql_week5);
+                    
+                    $week5_pref = 0;
+                    
+                    if ($result_week5->num_rows > 0) {
+                        $row_week5 = $result_week5->fetch_assoc();
+                        
+                        $week5_pref = $row_week5[sum];
+                    }
+                    
+                    $sql_week6 =    "SELECT mb.mb_id, mb.mb_name, count(mb.mb_id) 'sum' " .
+                                    "FROM merit_badge mb " .
+                                    "LEFT JOIN scout sc1 ON ((sc1.pref1_mb_id = mb.mb_id OR sc1.pref2_mb_id = mb.mb_id OR sc1.pref3_mb_id = mb.mb_id OR sc1.pref4_mb_id = mb.mb_id) AND sc1.unit_id IN " .
+                                        "(SELECT unit_id FROM unit WHERE week_id = 6)) " .
+                                    "WHERE mb.mb_id = " . $row_class[mb_id] . " ";
+                    $result_week6 = $conn->query($sql_week6);
+                    
+                    $week6_pref = 0;
+                    
+                    if ($result_week6->num_rows > 0) {
+                        $row_week6 = $result_week6->fetch_assoc();
+                        
+                        $week6_pref = $row_week6[sum];
+                    }
+                    
+                    $sql_week7 =    "SELECT mb.mb_id, mb.mb_name, count(mb.mb_id) 'sum' " .
+                                    "FROM merit_badge mb " .
+                                    "LEFT JOIN scout sc1 ON ((sc1.pref1_mb_id = mb.mb_id OR sc1.pref2_mb_id = mb.mb_id OR sc1.pref3_mb_id = mb.mb_id OR sc1.pref4_mb_id = mb.mb_id) AND sc1.unit_id IN " .
+                                        "(SELECT unit_id FROM unit WHERE week_id = 7)) " .
+                                    "WHERE mb.mb_id = " . $row_class[mb_id] . " ";
+                    $result_week7 = $conn->query($sql_week7);
+                    
+                    $week7_pref = 0;
+                    
+                    if ($result_week7->num_rows > 0) {
+                        $row_week7 = $result_week7->fetch_assoc();
+                        
+                        $week7_pref = $row_week7[sum];
+                    }
+                    
+                    $ret[] = array( "class_name" => $row_class[mb_name],
+                                    "scout_count_1" => $week1_pref,
+                                    "scout_count_2" => $week2_pref,
+                                    "scout_count_3" => $week3_pref,
+                                    "scout_count_4" => $week4_pref,
+                                    "scout_count_5" => $week5_pref,
+                                    "scout_count_6" => $week6_pref,
+                                    "scout_count_7" => $week7_pref,
                                     "size_limit" => $class_max);
                 }
         }
